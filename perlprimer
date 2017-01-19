@@ -3,7 +3,6 @@
 # PerlPrimer
 # Designs primers for PCR, Bisulphite PCR, QPCR (Realtime), and Sequencing
 
-# version 1.2 (16 Jan 2017) 
 # Copyright © 2003-2017, Owen Marshall
 
 # This program is free software; you can redistribute it and/or modify
@@ -29,7 +28,7 @@ use strict;
 
 my ($version, $commandline, $win_exe);
 BEGIN {
-	$version = "1.2";
+	$version = "1.2.1";
 	$win_exe = 0;
 	
 	($commandline) = @ARGV;
@@ -115,6 +114,7 @@ use File::Copy;
 use File::Glob ':glob';
 use HTTP::Tiny;
 use JSON;
+use File::Basename;
 require Tk::NoteBook;
 require Tk::HList;
 require Tk::ItemStyle;
@@ -4251,7 +4251,9 @@ sub copy_selected_primers {
 	my @sel = $$ref->selectionGet;
 	
 	# Clipboard copying routine	
-	my $clip = "Forward Primer\tPos\tLen\tTm\tReverse Primer\tPos\tLen\tTm\tAmp\tdG\n";
+	my $clip = ($page eq "seq") ?
+		"Name\tForward Primer\tPos\tLen\tTm\n" :
+		"Name\tForward Primer\tPos\tLen\tTm\tName\tReverse Primer\tPos\tLen\tTm\tAmp\tdG\n";
 	
 	my (@gene_array, $gene_frame, $seq);
 	if ($page eq "pd" && (($primer_seq_5f) || ($primer_seq_5r))) {
@@ -4260,10 +4262,28 @@ sub copy_selected_primers {
 		$gene_frame=$gene_array[0][0]%3;
 	}
 	
-	foreach (@sel) {
-		my $sel = $_;
-		for my $j ( 0 .. 4, 8, 6, 7, 9, 10 ) {
-	    		if ($page eq "bis") {
+	my ($file_name,$dir,$ext) = fileparse($open_file{$page}, qr/\.[^.]*/);
+	$file_name =~ s/_.*//g;
+		
+	foreach my $sel (@sel) {
+		my $nb_page = which_nb_page();
+		
+		my @details;
+		if ($page eq "seq") {
+			@details = (0 .. 3);
+		} else {
+			@details = ( 0 .. 4, 8, 6, 7, 9, 10 );
+		}
+		
+		for my $j (@details) {
+			# Names
+			if ($j == 0) {
+				$clip .= $file_name."_".$$slist[$sel][1]."F\t";
+			} elsif ($j == 4) {
+				$clip .= $file_name."_".$$slist[$sel][8]."R\t";
+			}
+			
+	    	if ($page eq "bis") {
 	    			# Primer redundancy for CpG residues:
 				# Replaces T with Y (pyrimidine) for forward
 				# Replaces A with R (purine) for reverse
@@ -7311,7 +7331,7 @@ sub open_fasta {
 }
 
 sub format_file_name {
-	my ($name) = @_;
+	my $name = shift;
 	$name =~ s/\s+/_/g; # replace spaces with underscores
 	$name =~ s/[\(\)\,\.\;]//g; # remove brackets and punctuation
 	$name =~ s/\|/-/g; # replace pipes with dashes
