@@ -3304,7 +3304,7 @@ sub primer_dimer_new {
 		}
 	}
 	
-	# check for best binding for each possibility that yeilds two or more matched bases together
+	# check for best binding for each possibility that yields two or more matched bases together
 	my $last;
 	my @unequal_loops;
 	foreach my $i (@binding_data) {
