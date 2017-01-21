@@ -1,0 +1,340 @@
+21/1/17  (PerlPrimer-1.2.2)
+- Added a "-1" button to the range options: use "Set from ORF" and then "-1" to only find primers that cover the entire ORF.
+
+20/1/17  (PerlPrimer-1.2.1)
+- Added a name column when copying primers (the name is built from the gene name, the coordinates of the primer and the direction).
+
+16/1/17  (PerlPrimer-1.2)
+- Re-wrote Ensembl routines to use the Ensembl REST API (a much more elegant solution -- thanks to Ensembl for developing this).  Ensembl compatibility should never break again. (Some code tidying still needs to be done to remove some redundancies, but the code is fully functional.  Please note that Ensembl REST sadly provides no fuzzy searching for genes: the correct gene name or Ensembl ID must be used.)
+
+17/2/11  (PerlPrimer-1.1.20)
+- Fixed Ensembl compatibility
+- Fixed small error in Tm calculation code (thanks to Henning Lenz for pointing this out)
+- Changed browser launching code in Windows (used for viewing alternative transcript data)  It's not particularly nice (still blocks the GUI) but it does seem to work.
+
+17/3/10  (PerlPrimer-1.1.19)
+- Fixed Ensembl compatibility again (Ensembl search now lists the genes first, without transcript info)
+
+9/10/09  (PerlPrimer-1.1.18)
+- Fixed Ensembl compatibility
+- Added many more Ensembl genomes to the dropdown list
+
+24/3/09  (PerlPrimer-1.1.17)
+- Fixed Ensembl retrieval of genomic sequences (thanks to Karl Kashofer for this fix!)
+
+10/12/08  (PerlPrimer-1.1.16)
+- Fixed general compatibility with Ensembl database
+- New fix for Ensembl transcripts recognition -- should find transcripts from all Ensembl databases
+
+31/08/07  (PerlPrimer-1.1.15)
+- Ensembl compatibility restored for Arabidopsis genes
+
+18/10/06  (PerlPrimer-1.1.14)
+- Ensembl compatibility restored once again (slight change in the searchview output was causing problems)
+
+22/6/06  (PerlPrimer-1.1.13)
+- Ensembl compatibility restored again (back to searchview)
+- Added code to check for the presence of Genomic and mRNA seqs before running spidey (error message that resulted otherwise was confusing to users)
+
+5/6/06  (PerlPrimer-1.1.12)
+- Retrieval of un-annotated genes from Ensembl (using the Ensembl Gene ID) is now possible
+- BLAST search results compatibility restored
+- ORF calculation re-written to allow for transciption initiation from TTG, GTG and CTG codons, in the absence of an initiating ATG
+
+31/5/06  (PerlPrimer-1.1.11)
+- Ensembl compatibility restored yet again (Ensembl now apparently back to using a modified text view rather than searchview)
+- Better error notification if the Ensembl format changes yet again
+- Fixed a small bug related to finding the GCG restriction enzyme file in the user's home directory
+
+20/3/06  (PerlPrimer-1.1.10)
+- Ensembl compatibility yet again restored
+- Button in Ensembl transcripts dialogue to allow user to open a browser
+window to view the different transcripts (on the Ensembl gene web page)
+- Option in Preferences->Network to specify web browser to use (may not work
+under Win32 - seems to use default system browser regardless)
+- List of Ensembl genome databases updated
+- Translation from forward primer to ORF start is now shown in a lighter
+colour
+- Active buttons in dialogues are now invoked by pressing <Return>
+- Update to checkbutton referencing code to support later versions of Perl/Tk
+under *nix
+- Slight cosmetic changes to GUI colours
+
+8/9/05 (PerlPrimer-1.1.9)
+- Ensembl compatibility restored once again
+- Slight change to Spidey error dialogue to reflect the possibility that the error might be Ensembl-related
+
+9/8/05 (PerlPrimer-1.1.8)
+- Ensembl compatibility is restored, and now allows the user to select the desired transcripts from genes
+- View intron/exon structure now provides a indication of sequence length
+- Minor code tidying
+
+30/05/05 (PerlPrimer-1.1.7)
+- Added "Span Intron/Exon Boundary" option for QPCR - this is selected by default and was the previous default behaviour; however, it is now possible to design primers for sequences without introns (e.g. 18S)
+- Added GC% information for Primer information tab, and adjusted the layout
+- Ensembl genome databases updated (added Canis_familiaris, Gallus_gallus, Pan_troglodytes, Saccharomyces_cerevisiae, Tetraodon_nigroviridis, Xenopus_tropicalis; removed Caenorhabditis_briggsae)
+- Retieve gene from Ensembl function now always prompts user to select from the list of matching gene names, even if only one name matches - this ensures that the correct gene has been identified (Ensembl occasionally has some unexpected single matches to queries)
+- Some Ensembl search matches were not detected correctly due to a slight change in the HTML output from Ensembl - this is now adjusted for
+- Added word-size option to blast searching - BLAST now uses the more correct word size of 7 bases by default
+- Blast search now uses real clock measurments to show elapsed time, rather than just calculating the number of times the routine had been called
+- Default interface font on Windows is now Arial instead of MS Sans Serif - using a TrueType font such as Arial allows nice sub-pixel rendering on LCD displays
+- Updated Rebase restriction enzyme file to gcg.505
+- BUGFIX: Sequence right-click menu works again
+- BUGFIX: Save FASTA dialogue now works correctly
+- BUGFIX: DNA graphic and primers are now resized when window is resized
+
+01/04/05 (PerlPrimer-1.1.6)
+- BUGFIX: Problems in Tm and dG calculation that prevented program startup when [dNTPs] > [Mg++] - quick fix provided to prevent this by keeping the value of sqrt([Mg++] - [dNTPs]) as 0.  A warning prompt is displayed if this situation is set in the preferences
+- BUGFIX: Oligo concentration in the preferences was incorrectly described as being in mM when it is in fact calculated as nM
+- Acknowledgment of Rebase files provided in the acknowledgements dialogue
+- Tutorial html file from http://perlprimer.sf.net added to distribution package
+
+21/12/04 (PerlPrimer-1.1.5)
+- Old preferences are automatically copied to the new home directory location when upgrading
+- Win32 executable built with ActivePerl 5.8.6 and PAR 0.86
+
+20/12/04
+- PerlPrimer now translates in frame from the forward primer if this starts upstream of the ORF (allows easy identification of stop codons when designing cloning primers)
+- Better handling of information from FASTA files - FASTA header now automatically becomes the file name
+- Several minor bug fixes and code-tidying
+
+03/11/04
+- Home and temporary directory fixes - directories are now set from Perl environmental variables if possible; tmp directory set to home if user does not have correct read/write permissions or if directory does not exist
+- Full primer-dimer values are calculated as well as extensible primer-dimers, and results are sorted based on both values
+
+01/09/04
+- BLAST search can now use a local blast database and server
+- "View intron/exon structure" button in QPCR tab graphically draws the exon/intron structure of the genomic DNA (thus showing the size of the introns)
+- New browse directory code (requires a recent version of Perl/Tk to run correctly)
+- BUGFIX: Saving .ppr files did not work correctly under some Perl distributions
+- Complete re-write of the internal GUI code (now made more extensible and more comprehensible)
+
+13/07/04 (PerlPrimer-1.1.4a)
+- BUGFIX: "Open Sequence" buttons did not work correctly when opening sequences in FASTA format (or genomic DNA sequence for QPCR tab)
+- BUGFIX: Bisulphite PCR tab did not display primer information in the status bar when dimer dG == 0
+- BUGFIX: Finding sequencing primers without a dG cutoff did not calculate dG for primers
+- Minor GUI changes for Win32 to work with ActivePerl v5.8.4 (some cosmetic Perl/Tk changes)
+
+21/06/04 (PerlPrimer-1.1.4)
+- View spidey output command now runs spidey directly
+- Win32::FileOp code disabled - causes redraw problems with Perl/Tk
+- Minor code tidying
+
+17/06/04
+- BUGFIX: Fixed a bug added in the last version that did not reverse the 3' restriction enzyme site and anchor when adding cloning sequences
+
+28/04/04
+- Work begun on unequal loops primer-dimer routines (not fully implemented as yet)
+
+22/04/04
+- Code to support Win32::FileOp if it exists under windows for selecting directories, as DirTree seems flakey at best with some extremely eratic behaviour.  This is not currently an ActivePerl module, so will only be relevant for the Windows installer version.
+
+21/04/04 (PerlPrimer-1.1.3a)
+- Windows installer version only
+- PerlPrimer now searches for Spidey in the PerlPrimer directory on startup
+- Minor code tidying
+
+19/04/04 (PerlPrimer-1.1.3)
+- Trial self-executable format for Windows (warning: >3 Mb download) created using PAR (http://par.perl.org)
+- Save DNA sequence dialogue now has options for both .fasta and .txt formats (default is .fasta)
+- Saving DNA sequence in FASTA format now prompts the user for a description line (default is the open file name, if any)
+- Better processing of FASTA files when opening (whitespace and some illegal characters are removed from the description line when taking the file name)
+
+18/04/04
+- Buttons to choose home, tmp, and spidey-location directories in the Preferences dialogue
+- Rearranged Preferences dialogue:  Separate sections for directories and behaviour when opening new files in the "General" tab; defer-to-capitalised-regions option is now in the "Bioinformatics" tab
+
+15/04/04
+- Checkbox now present to control whether QPCR primers need to span an intron/exon boundary or not (old method from 02/04/04 still works as well)
+- When QPCR data are retrieved from Ensembl, Spidey is run automatically and intron/exon boundaries are shown on the DNA graphic
+- QPCR exon limits can now be selected with the mouse on the DNA graphic - use the left button to select the 5' range and the middle button (or Ctrl-Button 1) to select the 3' range (i.e. just like setting the range for other PCR methods)
+- Species name is now added to the default file name when a sequence is retrieved from Ensembl
+- Path to system temporary directory can be set in the Preferences
+- BUGFIX: Generate report did not save a report if the perlprimer file had not been saved
+- BUGFIX: PerlPrimer now handles degenerate sequences better (including gapped sequences) when finding ORFs
+- BUGFIX: If default values were 0 they were not restored to default when opening a new file
+- Code tidying and new balloon help messages
+
+14/04/04
+- QPCR can now select primers targeting a range of exons or a single exon (suggested by Alf Eaton)
+- BUGFIX: temporary dna and mrna files for Spidey are now saved in the system tmp directory, rather than the directory where Spidey is located (suggested by Alf Eaton)
+
+02/04/04
+- QPCR can now design primers that surround an intron/exon boundary but do not span the boundary (delete the value in the "Minimum Intron/Exon boundary" box for this to work (now deprecated - see above)) (suggested by John Luckey)
+
+01/04/04
+- Changes to dialogue box code
+- Minor code tidying
+
+31/03/04
+- Preferences option to automatically find primers when receiving data from external applications through the tcp socket
+- Opening a new file when previous data exists now prompts the user to save (may be overridden in the preferences)
+- Opening a file now explicitly clears all data before opening
+
+30/03/04
+- TCP socket reading added for interaction between PerlPrimer and Contig Viewer
+
+29/03/04 (PerlPrimer-1.1.2)
+- BUGFIX: After finding sequencing primers, primer-dimer finding routine was not reset to only search for extensible dimers
+- Minor changes to DNA sequence opening routines to make use of the improved FASTA header functions 
+
+24/03/04
+- BUGFIX: a simple bug in the CpG island detection algorithm prevented small islands from being reported
+- BUGFIX: PerlPrimer under MacOS X now correctly detects it is running under a unix environment
+- Better routines for finding the Spidey executable on all platforms (perlprimer now uses a *pidey.* glob and picks the largest file from all matches, in case the archive file is present in the same directory)
+- Perlprimer now screens each primer for degenerate/non-DNA symbols and will not calculate Tm if these are present
+
+22/03/04
+- All fonts (main gui font, primer list font and fixed font for sequences) can now be specified in the preferences (suggested by Alf Eaton)
+
+16/03/04 (PerlPrimer-1.1.1)
+- Added the .fasta file type to the Open File dialogue box
+
+15/03/04
+- New feature: PerlPrimer can save current parameters as defaults for each PCR tab (Use the Tools menu option "Save default values for this page").  Values are saved to files in the user's home directory, ".perlprimer.[name_of_page]".  (Use the Tools menu option "Restore in-built default values" to delete this file)
+
+11/03/04
+- New feature: PerlPrimer can now open FASTA files with range information included in the FASTA header - syntax for the first line is ">Name of DNA sequence 5prime_region[?-?] 3prime_region[?-?] page[?]" where the page argument is optional (defaults to the standard PCR page) and where page 1 = standard PCR, page 2 = bisulphite PCR, etc.  Suggested by Alexander Kozik, for use by Contig Viewer (http://www.atgc.org/Py_ContigViewer/)
+
+09/03/04 (PerlPrimer-1.1)
+- Minor code tidying
+
+02/03/04
+- New icons for opening and saving DNA sequences
+- BUGFIX: a workaround for a very weird Perl/Tk bug - if the Preferences dialogue was opened and closed twice, PerlPrimer stopped doing floating point arithmetic (?!).
+
+27/02/04
+- If multiple genes match the expression used to search the ensembl database, PerlPrimer now displays the complete list and allows the user to choose any of the descriptions (or to cancel and refine the search)
+- Primer-dimer routines revised again - previous method was not considering that initial/terminal mismatches will not contribute to dimer instability and thus should not be included when calculating dG values
+- New feature: Users can select the temperature at which to calculate primer-dimer dG in the preferences
+- Default MRU file list is now 8 files
+
+23/02/04
+- New feature: Users can disable repeat/run checking in the Preferences window
+- Completed abstraction of the add_cloning subroutine
+- BUGFIX: Preference writing routine now saves the MRU file list when closing preferences dialogue (previously the MRU file list was lost if the preferences were changed and then PerlPrimer was killed)
+- Several minor bug fixes
+- General code tidying
+
+18/02/04
+- New feature: "Find primers for cloning" menu option (in the tools menu) - only available in standard PCR mode, reduces the 5' outer range by 10 bp increments and the 3' inner range by 10 bp increments until primers are found
+- Renamed "Auto +", "Auto -" buttons to "Find outwards" and "Find inwards"
+
+05/02/04
+- New feature: "Add cloning sequences" dialogue.  PerlPrimer now uses the GCG restriction enzyme database file from REBASE to list the non-cutting restriction enzymes within a sequence when in Standard PCR mode.  To use, select "Add cloning sequences" from the Tools menu.  (note: the file 'gcg.###' - included with the distribution - will need to be installed in either your home directory or in the same directory as PerlPrimer for this to work)
+- Minor bug fixes
+
+02/02/04 (PerlPrimer-1.0.2)
+- Added a Recently Opened Files menu (number of files is customisable through the preferences)
+- Added bindings for left and right arrow keys when focussed in the primer lists - allows the user to quickly switch to the primer-dimer tab (with the right arrow key) and back again (with the left arrow key).  Note that up and down arrow keys will still move through the primer list as before
+- PerlPrimer now deletes the dna and mrna temporary files required by Spidey after use
+- The %GC above and below which to exclude primers automatically can now be set in the preferences (before it was between 40% and 60%)
+- Several cosmetic changes:
+- look-and-feel of menubar and toolbar is now OS dependent
+- fonts are consistent across all widgets (exception under windows is the HList font - set to be verdana at one point less than the user assigned font size)
+- most fonts may be overridden by system defaults if desired
+- the notebook widget on Win32 now has shaded inactive tabs
+- minor interface tidying
+- If sequencing primers cannot be found within the specified read length between primers, a dialogue is now displayed and the run is aborted (previously, the program would find the next best primer, which could be at a distance much greater than that specified)
+- Slight modifications to the preference reading/writing routines to allow array data to be saved (needed for the recently used files list)
+- Open and Save file functions now list the percentage opened/saved on the status line
+- The dG hash for calculating primer-dimer stability is now calculated from the current salt conditions and the enthalpy and entropy hashes - meaning that primer-dimer calculations are much more accurate. (note that if changing salt concentrations in the preferences, OK needs to be pressed before the hash is recalculated)
+- Reworked menus in the new (and more correct) Perl/Tk format
+- Re-ordering of File menu items
+- "Sort primers" popup menu is now a sub-menu
+- Minor bugfixes and code tidying
+
+23/1/04 (PerlPrimer-1.0.1)
+- PerlPrimer now uses eval routines to check for all perl modules, and either exits with a useful message or disables some functions if a module is not found.
+- Several minor bugs fixed/general code tidying.
+
+- NB: Previous public release (1.0) had an older copy of perlprimer (Beta 5) by mistake - please upgrade if using that release as several important bugs have been fixed.
+
+18/12/03 (PerlPrimer-1.0)
+- BUGFIX: Generate Report (and copy printable) now includes the last line of sequence
+- Minor code tidying
+
+16/12/03 (PerlPrimer-1.0_Beta_6)
+- Rehashed primer-dimer routine (again!) - routine now only searches for *extensible* 3' primer-dimers when searching for primer pairs, and pd_full now searches for all other primer-dimers (3' and 5').  This equates to approximately a 100% increase in speed when searching for primers, and provides more useful information to the end user.
+- BUGFIX: Generate Report now provides the correct information for amplicon size and primer positions.
+- Partially abstracted the added-cloning-sequence routines to a subroutine (only implemented for the dna_magnify routine as yet)
+
+12/12/03
+- BUGFIX: removed a few extraneous bitwise ands that were lying around (caused problems with some Perl distributions) - suggested by Chris Vega
+- BUGFIX: made all Tk calls use a dash for each option key (caused problems on some systems) - suggested by Chris Vega
+
+11/12/03 (PerlPrimer-1.0_Beta_5)
+
+10/12/03
+- BLAST search now has a (semi-fake) elapsed time display while searching (counts 15 seconds per search interval, which should be approximately correct!)
+- BUGFIX: Many minor bugs squashed, including several problems that occured when range values were defined but 0
+- Open sequence will accept and work with multi-lined entries (preventing slowdowns, although ORF finding will still convert to a single lined entry - this needs to be changed)
+- Many other minor changes/tidying
+- Balloon help texts updated for the new options (sequencing page, pref options, etc)
+
+
+07/12/03
+- New feature: Sequencing page (finds primers spaced at a user-defined interval along a sequence)
+- Gui packing system greatly reworked, now uses far less reliance on the grid geometry manager and less frames to achieve layout.  A new subroutine, nr() (=newrow) is used to create new frame rows, and all widgets are packed into the last row created from the left - simpler and easier.  Should also be slight faster when redrawing on old systems.
+- BUGFIX: QPCR tab was not assigned a "File not saved" description, thus not displaying the open file name correctly.
+- Reworked the primer windowing subroutines to now use a two dimensional array to store primer details (slightly faster and much neater)
+- New feature: PerlPrimer no longer defers to capitalised regions by default but uses the ORF/CpG finding algorithms instead (less confusing and more useful)  Defer to capitalised regions is now a preferences option.
+- New feature: PerlPrimer no longer emulates cpgplot behaviour by default, but uses the "correct" algorithm instead.  Emulate cpgplot behaviour is now a preferences option.
+- Dialogues are now unique (for non-static dialogues the old is destroyed before the new one is created);
+- Main window now has a minimum size (= the default packing size when the program is started) to prevent widgets disappearing when the window is resized too small. 
+- General code tidying and far too many small changes to list independantly.
+
+27/11/03 (perlprimer-1.0_Beta_4)
+- Redesigned Tm and Primer Size widgets, and amplicon size widgets in QPCR tab
+
+26/11/03
+- File saving reworked: PerlPrimer now has standard "Save"/"Save as" functionality and behaves as expected
+- Title of program now displays the name of the file being worked on, even if multiple files are open at the same time
+- Default extention of saved sequences and reports is now .txt
+
+25/11/03
+- New feature: proxy server support (enter in preferences) - will still use env_proxy if box unchecked
+- File open/save now allows multiple line DNA sequences - prevents slowdown for large genomic sequences used for QPCR
+- Default exclude_ie value is now 7 (was 5, which generates far too many primers for most genes and is not as specific)
+- BUGFIX: intron-exon boundary checking was not quite right with exclude_ie - this is now fixed.
+
+24/11/03 (perlprimer-1.0_Beta_3)
+- New feature: retrieve genes from Ensembl - which also will automatically retrieve genomic and cdna sequence for QPCR
+- New QPCR option: minimum intron/exon boundary - sets minimum overlap of primers across intron/exon boundary
+- Minor code tidying/fixes
+
+20/11/03 (perlprimer-1.0_Beta_2)
+- BUGFIX: fixed infinite loop that occurred when no primers were found using the "Auto +" button
+- pp_open_file routine now checks that a PerlPrimer file has in fact been selected and prompts if not
+- "Generate Report" now includes Amplicon size and primer position information
+- Minor code tidying
+
+13/11/03 (perlprimer-1.0_Beta_1)
+- Preferences dialogue now in NoteBook format
+- Preference options for BLAST searching (and associated modification of BLAST subroutine)
+- "Generate Report" now includes modified primers, file name and date
+- pack_gui subroutine now supports BrowseEntry widgets (needed for BLAST preferences)
+- Minor code tidying 
+
+11/11/03 (perlprimer-0.99.95)
+- BUGFIX: primer Tm was not calculated for lower-case primers
+- get_tm subroutine is now specific for a single primer if only one is entered
+- Minor code changes/tidying
+
+28/10/03 (perlprimer-0.99.9)
+- "New File" feature added (see new_file subroutine)
+- Changes to dialogue subroutine to allow different dialogue types
+- New button-packing code for toolbars
+- Code tidying (especially GUI packing routines)/bug fixes
+
+26/10/03
+- "Generate Report" feature added
+- Toolbar added
+- Magnify button created next to canvas display
+- "New File" feature added to menus, but not yet implemented
+- Several icons added
+- General code tidying
+- "Reset" buttons removed - functionality taken over by "Set from ..." buttons
+
+24/10/03
+- Initial public release (perlprimer-0.99.8)

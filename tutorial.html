@@ -1,0 +1,424 @@
+<html><head><style type="text/css">
+
+BODY {
+	background: #FBFBFB;
+	padding: 0px;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 90%;
+	line-height: 130%;
+	height: 100%;
+	margin: 0px;
+}
+
+TABLE TD {
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	spacing: 0px;
+}
+
+br, p {
+	line-height: 130%;
+}
+
+UL, OL {
+	line-height: 130%;
+}
+
+A {
+	color: #336699;
+	text-decoration: none;
+}
+
+A:hover {
+	color: #993333;
+	text-decoration: underline;
+}
+
+SUP {
+	font-family: Verdana, sans-serif;
+	font-size: smallest;
+	line-height: 100%;
+}
+
+
+/* HEADER */
+
+.shadow1 {
+	background-color: #999999;
+	border-bottom: 1px solid #BBBBBB;
+	height:1px;
+	font-size: 1px;
+	width: 100%;
+}
+
+.shadow2 {
+	background-color: #DDDDDD;
+	height:1px;
+	font-size: 1px;
+	width: 100%;
+}
+
+.header {
+	background: #555555;
+	border-bottom: 1px solid #333333;
+	padding: 3px 10px 3px 10px;
+}
+
+.framework {
+	width: 100%;
+}
+
+
+/* FOOTER */
+
+.footer {
+/*	background: #CCCCCC; */
+	color: #666666;
+	border-top: 1px dotted #333333;
+	font-family: Verdana, sans-serif;
+	font-size: 80%;
+	margin-top: 3em;
+	padding-top: 0.5em;
+	padding-bottom: 1em;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+
+/* CONTENT */
+
+H1 {
+	color: #111111;
+	font-family: Trebuchet MS, "Times New Roman", serif;
+	font-size: 200%;
+	font-weight: normal;
+	margin-bottom: 0px;
+}
+
+H2 {
+	color: #444444;
+	font-family: Trebuchet MS, "Times New Roman", serif;
+	font-size: 160%;
+	font-weight: normal;
+	width: 100%;
+	margin-top: 0em;
+	padding-bottom: 0.25em;
+	margin-bottom: 0.25em;
+	border-bottom: 1px dotted #666666;
+}
+
+H3 {
+	color: #000000;
+	font-family: Trebuchet MS, "Times New Roman", serif;
+	font-size: 130%;
+	font-weight: normal;
+	margin-top: 1.5em;
+	margin-bottom: 0.75em;
+	padding: 0em;
+	text-decoration: underline;
+}
+
+H4 {
+	color: #000000;
+	font-family: Trebuchet MS, "Times New Roman", serif;
+	font-size: 130%;
+	font-weight: normal;
+	margin-top: 1.5em;
+	margin-bottom: 0.25em;
+	padding: 0em;
+}
+
+.date {
+	font-size: 80%;
+	color: #333333;
+	text-decoration: none;
+}
+
+.toc {
+	margin-left: 2em;
+	line-height: 130%;
+}
+
+.top {
+	padding: 0em;
+	border: 0px;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.content {
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.reference {
+	font-family: Verdana, sans-serif;
+	font-size: 80%;
+	color: #303030;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+.rule {
+	height: 1px;
+	padding: 0px;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}	
+
+</style>
+
+<title>PerlPrimer</title><link rel="shortcut icon" href="http://perlprimer.sourceforge.net/favicon.ico" type="image/x-icon"></head>
+
+
+<body><div class="header"><br></div>
+<div class="shadow1"></div>
+
+<div class="shadow2"></div>
+<div class="top"><br>
+<table border="0" cellpadding="0" cellspacing="0"><tbody><tr>
+<td width="100%">
+<table border="0" cellpadding="0" cellspacing="0"><tbody><tr>
+<td>
+<h2><b>PerlPrimer - open-source PCR primer design</b></h2>
+<a href="http://perlprimer.sourceforge.net/index.html">About</a> | <a href="http://perlprimer.sourceforge.net/news.html">News</a> | <a href="http://perlprimer.sourceforge.net/download.html">Download</a> | Tutorial | <a href="http://perlprimer.sourceforge.net/methodology.html">Methodology</a> | <a href="http://perlprimer.sourceforge.net/links.html">Links</a> | <a href="http://perlprimer.sourceforge.net/screenshots.html">Screenshots</a> | <a href="http://perlprimer.sourceforge.net/contact.html">Contact</a> </td></tr></tbody></table>
+</td><td halign="right" valign="middle">
+<a href="http://sourceforge.net/"> <img src="tutorial_files/sflogo.png" alt="SourceForge.net Logo" align="middle" border="0" height="62" width="210"></a>
+</td></tr></tbody></table>
+</div>
+<div class="content">
+
+<h3>Contents</h3>
+<a href="#introduction">Introduction (and sample files)</a>
+<p><a href="#standard">Standard PCR</a>
+<br><span class="toc"><a href="#standard_restriction">Adding restriction enzyme cloning sequences</a></span>
+<br><span class="toc"><a href="#standard_saving">Saving a printable summary of the selected primer pair</a></span>
+<br><span class="toc"><a href="#standard_exporting">Exporting selected primers to a spreadsheet</a></span>
+</p><p><a href="#realtime">Real-time PCR</a>
+</p><p><a href="#sequencing">Sequencing Primers</a>
+</p><p><a href="#advanced">Advanced Features</a>
+<br><span class="toc"><a href="#advanced_finding">Finding primers</a></span>
+<br><span class="toc"><a href="#advanced_amplifying">Amplifying user-defined regions</a></span>
+<br><span class="toc"><a href="#advanced_specifying">Specifying PCR component concentrations</a></span>
+<br><span class="toc"><a href="#advanced_blast">Advanced BLAST searching</a></span>
+<br><span class="toc"><a href="#advanced_blast_local">Using a local BLAST server</a></span>
+<br><span class="toc"><a href="#advanced_ipc">Using other programs to communicate with PerlPrimer</a></span>
+<a name="introduction"><h3>Introduction</h3></a>
+</p><p>This tutorial covers most of the commonly used features of
+PerlPrimer, for standard PCR, real-time PCR and sequencing, using the
+human gene <i>PGR</i> (encoding the Progesterone Receptor protein) as
+an example. Example files for each section may be downloaded below
+(right-click on the links and choose either "Save Target As ..." or
+"Save Link to Disk ...", depending on your browser).
+</p><p><a href="http://perlprimer.sourceforge.net/hs_pgr_cDNA.txt">Human <i>PGR</i> cDNA sequence</a>
+<br><a href="http://perlprimer.sourceforge.net/hs_pgr_genomic.txt">Human <i>PGR</i> genomic sequence</a>
+</p><p><a href="http://perlprimer.sourceforge.net/hs_pgr_cloning.ppr">standard PCR perlprimer file</a>
+<br><a href="http://perlprimer.sourceforge.net/hs_pgr_qpcr.ppr">real-time PCR perlprimer file</a>
+<br><a href="http://perlprimer.sourceforge.net/hs_pgr_sequencing.ppr">sequencing perlprimer file</a>
+</p><p>The tutorial is based upon PerlPrimer 1.1 - users of older
+versions may find some features unavailable and are advised to upgrade
+to the latest version. All screenshots were made using the program
+running under Linux, however, the program should behave identically
+under Windows and MacOS X.
+</p><p>In addition to this tutorial, PerlPrimer also comes with
+extensive "Balloon Help", enabled by default (and which can be turned
+on or off in the Help menu). Simply hold the mouse pointer over a
+button or feature and a explanatory message should be displayed.
+</p><p><a name="standard"><h3>Standard PCR</h3></a>
+</p><p>While a DNA sequence may be opened from the sequence input area (click on the <img src="tutorial_files/open_dna_20.png">
+icon), the simplest means of retrieving a sequence is to use the
+Ensembl database tool. Click on the "Retrieve gene from Ensembl" icon <img src="tutorial_files/ensembl_20.png">
+or select it from the File menu. Enter "pgr" as the gene name and
+select "Homo_sapiens" as the organism. Make sure that "cdna" is set as
+the retrieval type, and click OK.
+</p><p>You should see a screen similar to that shown below (note that
+on earlier versions the amplification range will not be set
+automatically - click the "Set from ORF" button to do so) The range
+will now be set by default to the largest Open Reading Frame (or ORF)
+present in the sequence. The range is displayed by two boxes around the
+DNA sequence - one orange (the outer range) and one blue (the inner
+range). All primers will be found within the orange box and outside of
+the blue box.
+</p><p><img src="tutorial_files/img1.png">
+</p><p>(The following example considers cloning a gene by PCR
+amplification into an expression plasmid. Note, however, that primers
+may be designed around other regions of interest as well as genes or
+that amplification boundaries may be entered manually (see the section
+"Advanced uses" below))
+</p><p>To clone the cDNA ORF into an expression plasmid, we will
+generally want a forward primer before or encompassing the initiating
+ATG, and a reverse primer before the terminal stop codon. The simplest
+way to do this to use the "Find primers for cloning" command from the
+Tools menu - this will automatically decrease the 5' outer range and 3'
+inner range until primers pairs are found. (There is another way to do
+this - see the "Advanced Features" section below). Using the standard
+default parameters, this should find four primer pairs, the first one
+amplifying from bases 1443 -&gt; 4226. (see screen shot below)
+</p><p><img src="tutorial_files/img2.png">
+</p><p>Double-clicking on this primer pair (or pressing the right arrow
+key on the keyboard) will switch to the Primers tab, showing primer
+information and stable primer-dimers. The most stable extensible
+primer-dimer is fairly weak (dG°37 of -2.00 kcal/mol), and although the
+non-extensible Forward vs. Forward dimer may slightly reduce the primer
+population, it should not cause problems for the purpose of cloning the
+gene. (screen shot)
+</p><p><img src="tutorial_files/img3.png">
+</p><p>There is also a button on this page to BLAST primers using the
+NCBI BLAST server. Click on this and wait for the BLAST results to come
+up (this may take a minute or two - the server can be quite slow at
+times) Limit the results to human only by typing "Homo" into the search
+box and clicking the Search button. (screen shot) The forward primer is
+fairly unique, and although the reverse primer is less so it should be
+OK to amplify from. Return to the Standard PCR page and select this
+primer pair.
+</p><p><img src="tutorial_files/img4.png">
+</p><p><a name="standard_restriction"><h4>Adding restriction enzyme cloning sequences</h4></a>
+</p><p>The example provided here will clone the <i>PGR</i> ORF into
+GFP-fusion constructs (Clontech plasmids EGFP-C1 and EGFP-C2), creating
+both an N-terminal and a C-terminal fusion protein when translated.
+Select "Add cloning sequences" from the Tools menu. This will bring up
+a dialogue box with the ability to select restriction enzyme sites to
+add to the 5' end of each primer. By default, only those 6-base cutting
+enzymes that will not cut the DNA sequence within the outer range are
+listed. Looking at the restriction sites present in the plasmid MCS and
+comparing to the list of non-cutting enzymes, we can see that BglII and
+EcoRI can be used. Select these (see below) and click OK. Finally, we
+need to add the frame that the sites lie in, relevant to the EGFP gene
+(this is obviously only necessary when creating fusion proteins).
+Looking at the plasmid MCS, it should be clear that both BglII for
+EGFP-C1 and EcoRI for EGFP-N2 are in frame 0 (where the frame can be
+one of 0, 1 or 2 and 0 represents a sequence in frame). Enter "0" into
+each frame box.
+</p><p>EGFP-C1 MCS:
+</p><p><img src="tutorial_files/egfp_c1_mcs.png">
+</p><p>EGFP-N2 MCS:
+</p><p><img src="tutorial_files/egfp_n2_mcs.png">
+</p><p><img src="tutorial_files/img5.png">
+</p><p>Clicking on the <img src="tutorial_files/magnify.png"> icon next
+to the DNA graphic (also by right-clicking on the DNA graphic) will
+bring up an alignment of the DNA sequence and primers with cloning
+sequences attached. The ORF is translated and codons are highlighted
+(see below). Note the inserted Adenine base between the forward primer
+and the cloning site.
+</p><p><img src="tutorial_files/img6.png">
+</p><p><a name="standard_saving"><h4>Saving a printable summary of the selected primer pair</h4></a>
+</p><p>Clicking on the <img src="tutorial_files/report_20.png"> icon
+(or selecting "Generate Report" from the Tools menu) will save a text
+file listing the selected primer pair, statistics and primer-dimers of
+each primer and an alignment of the primers against the DNA sequence.
+</p><p>
+<a name="standard_exporting"><h4>Exporting selected primers to a spreadsheet</h4></a>
+</p><p>If satisfied with a primer pair or a group of primer pairs,
+right-click on the primer list and choose "Copy", or simply press
+Ctrl-C. The primers are copied in a tab-delimited format that can be
+pasted into any spreadsheet application.
+</p><p><a name="realtime"><h3>Real-time PCR</h3></a>
+</p><p>Designing real-time PCR primers with PerlPrimer is a simple and straightforward process.  This tutorial uses the Human <i>PGR</i> gene as an example.
+</p><p>Click on the "Retrieve gene from Ensembl" icon (picture) or
+select it from the File menu, enter "pgr" as the gene name and select
+"Homo_sapiens" as the organism. Click OK. PerlPrimer will automatically
+download the genomic and cDNA sequences for the gene. You should have a
+screen similar to that below. </p><p><img src="tutorial_files/img7.png">
+</p><p>Click on the "Find Primers" button. PerlPrimer runs the
+application Spidey, which finds intron/exon boundaries (displayed as
+white lines across the DNA graphic). It then selects primer pairs that
+will produce an amplicon within the bounds specified, which span at
+least one intron/exon boundary and in which at least one primer pair
+lies across an intron/exon boundary. (Thus the primers should only
+amplify cDNA and will not amplify genomic DNA) Primers are sorted by
+extensible primer-dimer stability. In this case, no primers are found
+on the first run - probably because the regions around the intron/exon
+boundaries have an abnormally high or low GC content. To test this, try
+changing the cutoffs for GC% from 40%-60% to 35%-65% (you can do this
+in the Preferences, under the "Exclusions" tab).
+</p><p>Searching for primers again now yields over 400 primer pairs (see below).
+</p><p><img src="tutorial_files/img8.png">
+</p><p>Of these, the first primer pair should be fine - BLAST searching
+as detailed above suggests that both primers are specific. Clicking on
+the <img src="tutorial_files/magnify.png"> icon now displays the intron/exon boundaries with the primers aligned (see below).
+</p><p><img src="tutorial_files/img9.png">
+</p><p><a name="sequencing"><h3>Sequencing Primers</h3></a>
+</p><p>Finding sequencing primers for any sequence is also extremely simple.  Using the example above of the human <i>PGR</i>
+cDNA sequence, open the sequence (or retrieve it from Ensembl), check
+that the default "Primers every ... bases" is appropriate for your
+average sequence read-length, and click the "Find Primers" button.
+Suitable primers will be listed, or if a gap is found where no primers
+match the required parameters, a dialogue will displayed informing the
+user that the search parameters will need to be relaxed. By default,
+primers are only listed if all primer-dimers have a dG°37 less than -5
+kcal/mol - this can be varied if required. In this case, we need to
+increase the maximum read length to 800bp to find primers (screenshot).
+</p><p><img src="tutorial_files/img10.png">
+</p><p><a name="advanced"><h3>Advanced Features</h3></a>
+</p><p><a name="advanced_finding"><h4>Finding primers</h4></a>
+</p><p>Two other buttons in the "Standard PCR" and "Bisulphite PCR"
+pages that have not been mentioned above are the "Find Inwards" and
+"Find Outwards" buttons - useful for amplifying regions of interest.
+The "Find Inwards" button reduces the inner amplified range by 10 base
+increments until suitable primers are found; the "Find Outwards" does
+the opposite - increasing the outer amplified range by 10 base
+increments until primers are found.
+</p><p>The inner and outer ranges can also be adjusted by using the
+mouse - dragging with the left mouse button affects the inner range;
+dragging with the middle mouse button (or the left button with the Ctrl
+key held down) affects the outer range.
+</p><p><a name="advanced_amplifying"><h4>Amplifying user-defined regions</h4></a>
+</p><p>While PerlPrimer will by default automatically find the largest
+ORF (or CpG islands) in a sequence, it is also possible to use a
+user-defined region, or number of regions. This can be achieved by
+capitalising the region of interest (most word processing/text editor
+programs should be able to do this) before opening the sequence in
+PerlPrimer, and selecting "Defer to capitalised regions" in the
+Preferences under the "General" tab. (click on the <img src="tutorial_files/preferences_20.png"> icon or select "Preferences" from the Tools menu).  The internal ORF and CpG island detection algorithms are now bypassed.
+</p><p>It is also possible to manually specify the base positions to
+amplify from by typing in the numbers into the Amplified Range section.
+</p><p><a name="advanced_specifying"><h4>Specifying PCR component concentrations</h4></a>
+</p><p>PCR component concentrations are set by default to the standard PCR conditions of 1.5mM Mg<sup>++</sup>, 50mM Monovalent cations (i.e. Na<sup>+</sup>, K<sup>+</sup>, etc), 0.2 mM dNTPs and a final concentration of each primer as 200mM.
+</p><p>These concentrations can be changed in the Preferences under the "General" tab (click on the <img src="tutorial_files/preferences_20.png">
+icon or select "Preferences" from the Tools menu). Please note that
+changing any of these values (including the primer concentration) will
+affect the <i>T<sub>m</sub></i>.
+</p><p><a name="advanced_blast"><h4>Advanced BLAST searching</h4></a>
+</p><p>Most parameters of BLAST searches (including the Expect value,
+the database and the ability to limit searches to an organism) can be
+set in the Preferences, under the "Bioinformatics" tab.
+</p><p><a name="advanced_blast_local"><h4>Using a local BLAST server</h4></a>
+</p><p>As of version 1.1.5, users may install and use a local BLAST server and data files.   <a href="ftp://ftp.ncbi.nlm.nih.gov/blast/executables/LATEST-BLAST/">Binaries</a> and <a href="ftp://ftp.ncbi.nih.gov/blast/db/">databases</a>
+are available from the NCBI ftp site - please see the README file for
+stand-alone BLAST included with the BLAST distribution for details on
+setting up the server and database files.
+</p><p>Once a local BLAST server has been setup, select "Use local
+BLAST server" from the "BLAST" tab in the Preferences dialogue, select
+the directory where BLAST server executables are located and select the
+relevant database file.
+</p><p><a name="advanced_ipc"><h4>Using other programs to communicate with PerlPrimer</h4></a>
+</p><p>As of version 1.1.3, PerlPrimer now establishes a listening
+socket on local port 2500 which other applications can use to send data
+directly to PerlPrimer (see <a href="http://www.atgc.org/Py_ContigViewer/">Contig Viewer</a>
+for an example of an application that uses this feature). The data
+format uses a modified FASTA format with optional PCR amplification
+boundaries set in the FASTA header; the syntax for the modified
+description line is
+</p><p><tt>&gt;Name of DNA sequence 5prime_region[?-?] 3prime_region[?-?] page[?]</tt>
+</p><p>where the optional page argument represents the PCR tab (thus 1
+= Standard PCR, 2 = Bisulphite PCR, 3 = Real-time PCR, etc). An example
+is:
+</p><p><tt>&gt;Contig2942 test file 5prime_region[53-185] 3prime_region[324-464]
+GGTTCCAATGGAGTTGTGATAAACGAAGAGCAGCACAAGCTCCCAATACCAAATTTAGTACTACTGACCAATTATAAAGAGTAAATATAGAAGATT
+AGGGTTTTAAGATCTCTAACAAAATTGCACTGGGAAGAATCTGGTTCTTCAATTTTCTGGGATTTATCAGATCTGAAGAAACTGAAGAGTGAAGTG
+GTAATCGTTGATAAGTGTATGTTCAAGGGAGGATTGTTTGGATTTACTGAACTGTTGTTTGATGTGGTTTTGGAGAAGATAAGATCTGTGATTTGT
+AAAACCCAAAACGGATTCTTTTTGTACTTGATTGATAGATCTTCAGTTTTTTTGGGAGTTGAATCAGTTATTGTTTAATTTAGAAATGGAGACACT
+TGTTGTTGTTTCTCAGCATAAGAATCACTACTATGATAGAACTAGGGGTCAAGCTCCTATTCGATTTGGATCCTTTGGGTCACCTCCTTCTGTAGG
+GTTCAAAGAGATAAATTGCCGGAATTTTGAATCAAGTGCCGGTATACTTCCTACCCCGTTAAAGGCCTATTCCACACCAGTCACTAAAAAGGGTTA
+TTCATCCTCGTTTCGTTCCAAAACACCTTCACCCCCATCATCTATCCAGGGTAAATCTCACTCTGAAAGTCAAAAGAAGTCG</tt>
+</p><p>To change the PCR amplification boundaries without resending the
+DNA sequence, simply send the FASTA description line only. The modified
+FASTA above can also be opened manually using the <img src="tutorial_files/open_dna_20.png"> button in the sequence boxes.
+</p></div>
+<p></p><div class="footer">© 2003-2005 Owen Marshall ... Last updated Fri Feb  4 16:46:40 2005</div>
+</body></html>
