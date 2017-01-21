@@ -28,7 +28,7 @@ use strict;
 
 my ($version, $commandline, $win_exe);
 BEGIN {
-	$version = "1.2.1";
+	$version = "1.2.2";
 	$win_exe = 0;
 	
 	($commandline) = @ARGV;
@@ -922,6 +922,7 @@ read_prefs();
 my %balloonmsg = (
 	'primer_getgene', "Find the longest ORF within the sequence and set the selected range",
 	'primer_reset', "Reset the range to the ORF boundaries",
+	'primer_stepin_1', "Reduce the inner range by 1bp on each side",
 	'primer_stepin', "Reduce the inner range by 10bp on each side",
 	'primer_stepout', "Increase the outer range by 10bp on each side",
 	'exclude_gc', "Exclude primers with a GC content outside the range specified in the preferences\n(default is 40-60% GC)",
@@ -1468,7 +1469,8 @@ pack_gui('LabFrame', 'Amplified range', 'primer_range_l', \$page_primer_designf)
 		pack_gui('Label', 'bases');
 	nr('', 0);
   		pack_gui('Button', 'Set from ORF', 'primer_getgene', \&reset_bounds);
-		pack_gui('Button', '-10', 'primer_stepin', \&step_in);
+		pack_gui('Button', '-1', 'primer_stepin_1', sub{step_in(1)});
+		pack_gui('Button', '-10', 'primer_stepin', sub{step_in(10)});
 		pack_gui('Button', '+10', 'primer_stepout', \&step_out);
 	
 pack_gui('LabFrame', 'Options', 'primer_options_l', \$page_primer_designf);
@@ -1634,7 +1636,8 @@ pack_gui('LabFrame', 'Amplified range', 'bisul_range_l', \$page_bisul_seqf);
 		pack_gui('Label', 'bases');
 	nr('', 0);
   		pack_gui('Button', 'Set from CpG island', 'bisul_getcpg', \&reset_bounds);
-		pack_gui('Button', '-10', 'primer_stepin', \&step_in);
+		pack_gui('Button', '-1', 'primer_stepin_1', sub{step_in(1)});
+		pack_gui('Button', '-10', 'primer_stepin', sub{step_in(10)});
 		pack_gui('Button', '+10', 'primer_stepout', \&step_out);
 
 pack_gui('LabFrame', 'Options', 'bisul_options_l', \$page_bisul_seqf);
@@ -6654,12 +6657,15 @@ sub reset_bounds {
 }
 
 sub step_in {
+	my $step_length=shift;
+	$step_length ||= 10;
+	
 	my ($min_ampsize, $max_ampsize, $max_range_5p, $min_range, $max_range, $max_range_3p, $sub_ref, $canv_ref, $seq_ref) 
 		= get_variables(qw(min_ampsize max_ampsize max_range_5p min_range max_range max_range_3p subroutine canvas seq)); 
 	
 	&$sub_ref() unless defined($$max_range_5p) && defined($$max_range_3p);
-	$$min_range += 10;
-	$$max_range -= 10;
+	$$min_range += $step_length;
+	$$max_range -= $step_length;
 	if ($$min_range >= $$max_range) {
 		sbarprint("\nNo primers found");
 		$cancel=1;
