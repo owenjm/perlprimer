@@ -3,7 +3,7 @@
 # PerlPrimer
 # Designs primers for PCR, Bisulphite PCR, QPCR (Realtime), and Sequencing
 
-# Copyright Â© 2003-2017, Owen Marshall
+# Copyright © 2003-2017, Owen Marshall
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 # USA
 
 use strict;
-use utf8;
 
 #---------------#
 # Usage message #
@@ -29,7 +28,7 @@ use utf8;
 
 my ($version, $commandline, $win_exe);
 BEGIN {
-	$version = "1.2.2";
+	$version = "1.2.3";
 	$win_exe = 0;
 	
 	($commandline) = @ARGV;
@@ -39,7 +38,7 @@ BEGIN {
 PerlPrimer v$version
 Designs primers for PCR, Bisulphite PCR, QPCR (Realtime), and Sequencing
 
-Copyright Â© 2003-2017 Owen Marshall\n
+Copyright © 2003-2017 Owen Marshall\n
 Usage: perlprimer.pl [file.ppr]\n
 EOT
 		exit 0;
@@ -49,7 +48,7 @@ EOT
 	if ($win_exe) {
 		print <<EOT;
 PerlPrimer v$version 
-Copyright Â© 2003-2017 Owen Marshall
+Copyright © 2003-2017 Owen Marshall
 Designs primers for PCR, Bisulphite PCR, QPCR (Realtime), and Sequencing
 
 This window is required for PerlPrimer to run - 
@@ -87,7 +86,7 @@ BEGIN {
 			
 			# Print warning header if not already printed
 			unless ($warning) {
-				print "PerlPrimer v$version\nCopyright Â© 2003-2011 Owen Marshall\n\n";
+				print "PerlPrimer v$version\nCopyright © 2003-2011 Owen Marshall\n\n";
 				$warning = 1;
 			}
 			
@@ -324,6 +323,7 @@ my $bs=0;
 my $qpcr_flag=0;
 my $cancel=0;
 my $defer_to_caps=0;
+my $onodera_clamp=0;
 
 # benchmarking - for code optimisation
 my $benchmark=0;
@@ -774,6 +774,7 @@ my %pref_variables = (
 	repeats_bs => \$repeat_bs,
 	runs_bs => \$run_bs,
 	exclude_rr_bs => \$exclude_rr_bs,
+	onodera_clamp => \$onodera_clamp,
 	max_gc => \$max_gc,
 	min_gc => \$min_gc,
 	mg_conc => \$mg_conc,
@@ -1333,13 +1334,13 @@ pack_gui('LabFrame', 'Forward primer', 'forward_l', \$page_primerf);
 			nr(\$row_counter[-1],0);
 			pack_gui('Label', 'Tm: ', 'fprimertm', -font=>$gui_font_bold);
 			pack_gui('Label', \$fprimer_tm, 'fprimertm');
-			pack_gui('Label', 'Â°C', 'fprimertm');
+			pack_gui('Label', '°C', 'fprimertm');
 			nr('',0);
-			pack_gui('Label', 'dSÂ°: ', 'fprimerds', -font=>$gui_font_bold);
+			pack_gui('Label', 'dS°: ', 'fprimerds', -font=>$gui_font_bold);
 			pack_gui('Label', \$fprimer_ds, 'fprimerds');
 			pack_gui('Label', 'eu', 'fprimerds');
 			# nr('',0);
-			# pack_gui('Label', "dGÂ°$pd_temperature: ", 'fprimerds');
+			# pack_gui('Label', "dG°$pd_temperature: ", 'fprimerds');
 			# pack_gui('Label', \$fprimer_dg, 'fprimerds');
 			# pack_gui('Label', 'kcal/mol', 'fprimerds');
 		nc(\$col_ref);
@@ -1348,7 +1349,7 @@ pack_gui('LabFrame', 'Forward primer', 'forward_l', \$page_primerf);
 			pack_gui('Label', \$fprimer_len, 'fprimerlen');
 			pack_gui('Label', 'bases', 'fprimerlen');
 			nr('',0);
-			pack_gui('Label', 'dHÂ°: ', 'fprimerdh', -font=>$gui_font_bold);
+			pack_gui('Label', 'dH°: ', 'fprimerdh', -font=>$gui_font_bold);
 			pack_gui('Label', \$fprimer_dh, 'fprimerdh');
 			pack_gui('Label', 'kcal/mol', 'fprimerdh');
 		nc(\$col_ref);
@@ -1357,7 +1358,7 @@ pack_gui('LabFrame', 'Forward primer', 'forward_l', \$page_primerf);
 			pack_gui('Label', \$fprimer_gc, 'fprimergc');
 			pack_gui('Label', '%', 'fprimergc');
 			nr('',0);
-			pack_gui('Label', "dGÂ°$pd_temperature: ", 'fprimerds', -font=>$gui_font_bold);
+			pack_gui('Label', "dG°$pd_temperature: ", 'fprimerds', -font=>$gui_font_bold);
 			pack_gui('Label', \$fprimer_dg, 'fprimerds');
 			pack_gui('Label', 'kcal/mol', 'fprimerds');
 
@@ -1373,13 +1374,13 @@ pack_gui('LabFrame', 'Reverse primer', 'reverse_l', \$page_primerf);
 			nr(\$row_counter[-1],0);
 			pack_gui('Label', 'Tm: ', 'rprimertm', -font=>$gui_font_bold);
 			pack_gui('Label', \$rprimer_tm, 'rprimertm');
-			pack_gui('Label', 'Â°C', 'rprimertm');
+			pack_gui('Label', '°C', 'rprimertm');
 			nr('',0);
-			pack_gui('Label', 'dSÂ°: ', 'rprimerds', -font=>$gui_font_bold);
+			pack_gui('Label', 'dS°: ', 'rprimerds', -font=>$gui_font_bold);
 			pack_gui('Label', \$rprimer_ds, 'rprimerds');
 			pack_gui('Label', 'eu', 'rprimerds');
 			# nr('',0);
-			# pack_gui('Label', "dGÂ°$pd_temperature: ", 'rprimerds');
+			# pack_gui('Label', "dG°$pd_temperature: ", 'rprimerds');
 			# pack_gui('Label', \$rprimer_dg, 'rprimerds');
 			# pack_gui('Label', 'kcal/mol', 'rprimerds');
 		nc(\$col_ref);
@@ -1388,7 +1389,7 @@ pack_gui('LabFrame', 'Reverse primer', 'reverse_l', \$page_primerf);
 			pack_gui('Label', \$rprimer_len, 'rprimerlen');
 			pack_gui('Label', 'bases', 'rprimerlen');
 			nr('',0);
-			pack_gui('Label', 'dHÂ°: ', 'rprimerdh', -font=>$gui_font_bold);
+			pack_gui('Label', 'dH°: ', 'rprimerdh', -font=>$gui_font_bold);
 			pack_gui('Label', \$rprimer_dh, 'rprimerdh');
 			pack_gui('Label', 'kcal/mol', 'rprimerdh');
 		nc(\$col_ref);
@@ -1397,7 +1398,7 @@ pack_gui('LabFrame', 'Reverse primer', 'reverse_l', \$page_primerf);
 			pack_gui('Label', \$rprimer_gc, 'fprimergc');
 			pack_gui('Label', '%', 'fprimergc');
 			nr('',0);
-			pack_gui('Label', "dGÂ°$pd_temperature: ", 'fprimerds', -font=>$gui_font_bold);
+			pack_gui('Label', "dG°$pd_temperature: ", 'fprimerds', -font=>$gui_font_bold);
 			pack_gui('Label', \$rprimer_dg, 'fprimerds');
 			pack_gui('Label', 'kcal/mol', 'fprimerds');
 
@@ -1441,9 +1442,9 @@ pack_gui('LabFrame', 'Primer Tm', 'primer_tm_l', \$page_primer_designf);
 		pack_gui('Entry', \$min_tm_pr, 'mintm', 3);
 		pack_gui('Label', '-');
 		pack_gui('Entry', \$max_tm_pr, 'maxtm', 3);
-		pack_gui('Label', 'Â°C  Difference');
+		pack_gui('Label', '°C  Difference');
 		pack_gui('Entry', \$max_diff_pr, 'maxdiff', 3);
-		pack_gui('Label', 'Â°C');
+		pack_gui('Label', '°C');
 	
 pack_gui('LabFrame', 'Primer Length', 'primer_len_l', \$page_primer_designf);
 	nr(\$packed_widgets{primer_len_l});
@@ -1534,7 +1535,7 @@ pack_gui('LabFrame', 'Primer Tm', 'seq_tm_l', \$page_sequencingf);
 		pack_gui('Entry', \$min_tm_seq, 'smintm', 3);
 		pack_gui('Label', '-');
 		pack_gui('Entry', \$max_tm_seq, 'smaxtm', 3);
-		pack_gui('Label', 'Â°C');
+		pack_gui('Label', '°C');
 
 pack_gui('LabFrame', 'Primer Length', 'seq_len_l', \$page_sequencingf);
 	nr(\$packed_widgets{seq_len_l});
@@ -1566,7 +1567,7 @@ pack_gui('LabFrame', 'Options', 'seq_options_l', \$page_sequencingf);
 	nr('', 0);
 		pack_gui('Checkbutton', 'Exclude self-complimentarity > -', 'exclude_pd_seq', \$exclude_pd_seq);
 		pack_gui('Entry', \$seq_pd_min, 'spdmin', 3);
-		pack_gui('Label', 'dGÂ°37');
+		pack_gui('Label', 'dG°37');
 
 pack_gui('LabFrame', 'Sequence', 'seq_seq_l', \$page_sequencingf);
 	nr(\$packed_widgets{seq_seq_l});
@@ -1608,9 +1609,9 @@ pack_gui('LabFrame', 'Primer Tm', 'bisul_tm_l', \$page_bisul_seqf);
 		pack_gui('Entry', \$min_tm_bs, 'bisul_mintm', 3);
 		pack_gui('Label', '-');
 		pack_gui('Entry', \$max_tm_bs, 'bisul_maxtm', 3);
-		pack_gui('Label', 'Â°C  Difference');
+		pack_gui('Label', '°C  Difference');
 		pack_gui('Entry', \$max_diff_bs, 'bisul_maxdiff', 3);
-		pack_gui('Label', 'Â°C');
+		pack_gui('Label', '°C');
 
 pack_gui('LabFrame', 'Primer Length', 'bisul_len_l', \$page_bisul_seqf);
 	nr(\$packed_widgets{bisul_len_l});
@@ -1694,9 +1695,9 @@ pack_gui('LabFrame', 'Primer Tm', 'qprimer_tm_l', \$page_qpcrf);
 		pack_gui('Entry', \$min_tm_q, 'qmintm', 3);
 		pack_gui('Label', '-');
 		pack_gui('Entry', \$max_tm_q, 'qmaxtm', 3);
-		pack_gui('Label', 'Â°C  Difference');
+		pack_gui('Label', '°C  Difference');
 		pack_gui('Entry', \$max_diff_q, 'qmaxdiff', 3);
-		pack_gui('Label', 'Â°C');
+		pack_gui('Label', '°C');
 
 pack_gui('LabFrame', 'Primer Length', 'qprimer_len_l', \$page_qpcrf);
 	nr(\$packed_widgets{qprimer_len_l});
@@ -2427,9 +2428,14 @@ sub primer_window {
 			}
 			
 			if ($exclude_clamp) {
-				# calculate GC clamp at 5' end: two out of last three residues required...
-				my $gc_clamp=gc(substr($currwindow, -3, 3));
-				next unless $gc_clamp > 50;
+				if ($onodera_clamp) {
+					# Onodera and Melcher exclusion
+					next unless onodera(substr($currwindow, -3, 3));
+				} else {
+					# calculate GC clamp at 5' end: two out of last three residues required...
+					my $gc_clamp=gc(substr($currwindow, -3, 3));
+					next unless $gc_clamp > 50;
+				}
 			}
 			
 			if ($exclude_rr) {
@@ -2903,6 +2909,11 @@ sub cc {
 	return $cc;
 }
 
+# Onodera and Melcher exclusion
+sub onodera {
+	$_ = shift;
+	return 1 if (m/[G|C][A|T][G|C]/ || m/[A|T][G|C][G|C]/ && !(m/[A|T]CG/));
+}
 
 #----------------#
 # Clean sequence #
@@ -3305,7 +3316,7 @@ sub primer_dimer_new {
 		}
 	}
 	
-	# check for best binding for each possibility that yields two or more matched bases together
+	# check for best binding for each possibility that yeilds two or more matched bases together
 	my $last;
 	my @unequal_loops;
 	foreach my $i (@binding_data) {
@@ -3498,7 +3509,7 @@ sub get_tm {
 	$packed_widgets{dim}->insert('end', "Warning: reverse primer run found\n", 'red') if ($rprimer =~ /(C{$run,}|A{$run,}|G{$run,}|T{$run,})/);
 	$packed_widgets{dim}->insert('end', "Warning: reverse primer repeat found\n", 'red') if ($rprimer =~ /(.{2,})\1{$repeat_real,}/);
 
-	$packed_widgets{dim}->insert('end', "Most stable 3' extensible primer-dimers (at $pd_temperatureÂ°C), if any\n\n", 'blue');
+	$packed_widgets{dim}->insert('end', "Most stable 3' extensible primer-dimers (at $pd_temperature°C), if any\n\n", 'blue');
 	
 	my ($pd1, $pd2, $pd3);
 	if ($fprimer && !check_degenerate($fprimer)) {
@@ -3531,7 +3542,7 @@ sub get_tm {
 	}
 	
 	# $pd_full = 1;
-	$packed_widgets{dim}->insert('end', "\nMore stable non-extensible primer-dimers (at $pd_temperatureÂ°C), if any\n\n", 'blue');
+	$packed_widgets{dim}->insert('end', "\nMore stable non-extensible primer-dimers (at $pd_temperature°C), if any\n\n", 'blue');
 	
 	if ($fprimer && !check_degenerate($fprimer)) {
 		primer_dimer($fprimer,$fprimer,1);
@@ -3570,16 +3581,16 @@ sub get_tm {
 		my $primer_text = <<EOT;
 Forward primer: $fprimer
 
-Tm: $fprimer_tmÂ°C\t\tLength: $fprimer_len bases
-dSÂ°: $fprimer_ds eu\t\tdHÂ°: $fprimer_dh kcal/mol
-dGÂ°$pd_temperature: $fprimer_dg kcal/mol
+Tm: $fprimer_tm°C\t\tLength: $fprimer_len bases
+dS°: $fprimer_ds eu\t\tdH°: $fprimer_dh kcal/mol
+dG°$pd_temperature: $fprimer_dg kcal/mol
 
 		
 Reverse primer: $rprimer
 
-Tm: $rprimer_tmÂ°C\t\tLength: $rprimer_len bases
-dSÂ°: $rprimer_ds eu\t\tdHÂ°: $rprimer_dh kcal/mol
-dGÂ°$pd_temperature: $rprimer_dg kcal/mol
+Tm: $rprimer_tm°C\t\tLength: $rprimer_len bases
+dS°: $rprimer_ds eu\t\tdH°: $rprimer_dh kcal/mol
+dG°$pd_temperature: $rprimer_dg kcal/mol
 
 		
 $dimer_text\n
@@ -5405,7 +5416,7 @@ sub info {
 	
 	my $text = <<EOT;
 PerlPrimer v$version
-Copyright Â© 2003-2017 Owen Marshall\n
+Copyright © 2003-2017 Owen Marshall\n
 EOT
 	my $text2 = <<EOT;
 An application to design primers for PCR, Bisulphite PCR, Real-time PCR and Sequencing.
@@ -5528,11 +5539,16 @@ Restriction enzyme data are provided by the REBASE project (http://rebase.neb.co
 Roberts RJ, Vincze T, Posfai J, Macelis D.  REBASE - restriction enzymes and methylases.  Nucleic Acids Res. 2003; 31:418-20.
 EOT
 
-	
+	my $text_gc_clamp=<<EOT;
+Strict GC clamp rules (need to be enabled in preferences) are based on:
+
+Onodera K, Melcher U.  Selection for 3' end triplets for polymerase chain reaction primers.  Mol Cell Probes. 2004 Dec;18(6):369-72.
+EOT
+		
 	my $text_thermo=<<EOT;
 Thermodynamic parameters are based on the following papers:
 
-Allawi HT, SantaLucia J Jr.  Thermodynamics and NMR of internal G.T mismatches in DNA.  Biochemistry. 1997 Aug 26;36(34):10581-94
+Allawi HT, SantaLucia J Jr.  Thermodynamics and NMR of internal G.T mismatches in DNA.  Biochemistry. 1997 Aug 26;36(34):10581-94.
 
 SantaLucia J Jr.  A unified view of polymer, dumbbell, and oligonucleotide DNA nearest-neighbor thermodynamics.  Proc Natl Acad Sci U S A. 1998 Feb 17;95(4):1460-5. 
 
@@ -5548,7 +5564,7 @@ EOT
 	my $text_entropy=<<EOT;
 Entropy corrections for PCR salt conditions are based on:
 
-von Ahsen N, Wittwer CT, SchÃ¼tz E.  Oligonucleotide Melting Temperatures under PCR Conditions: Nearest-Neighbor Corrections for Mg2+, Deoxynucleotide Triphosphate, and Dimethyl Sulfoxide Concentrations with Comparison to Alternative Empirical Formulas.  Clinical Chemistry.  2001; 47(11):1956-1961
+von Ahsen N, Wittwer CT, Schütz E.  Oligonucleotide Melting Temperatures under PCR Conditions: Nearest-Neighbor Corrections for Mg2+, Deoxynucleotide Triphosphate, and Dimethyl Sulfoxide Concentrations with Comparison to Alternative Empirical Formulas.  Clinical Chemistry.  2001; 47(11):1956-1961
 EOT
 		
 	my $text_cpg=<<EOT;
@@ -5579,6 +5595,9 @@ EOT
 	
 	$packed_widgets{ack_text}->insert('end', "\n\nEntropy corrections\n\n", 'bold');
 	$packed_widgets{ack_text}->insert('end', $text_entropy);
+	
+	$packed_widgets{ack_text}->insert('end', "\n\nGC clamp parameters\n\n", 'bold');
+	$packed_widgets{ack_text}->insert('end', $text_gc_clamp);
 	
 	$packed_widgets{ack_text}->insert('end', "\n\nBisulphate PCR primer design\n\n", 'bold');
 	$packed_widgets{ack_text}->insert('end', $text_cpg);
@@ -5779,6 +5798,14 @@ sub prefs {
 			pack_gui('Label', '% GC content');
 		nr();
 			pack_gui('Label', '(Used when "Exclude %GC" is checked on a project page)');
+		nr('', 7);
+		
+		nr();
+			pack_gui('Label', "3' GC clamp", '', -font=>$gui_font_bold);
+		nr();
+			pack_gui('Checkbutton', 'Use Onodera and Melcher (2004) rules', "prefs_onodera", \$onodera_clamp);
+		nr();
+			pack_gui('Label', '(Selects for WSS or SWS but not WCG at 3\' end)');
 		
 		nr('',2);
 			
@@ -5857,7 +5884,7 @@ sub prefs {
 		nr();
 			pack_gui('Label', 'Calculate primer-dimer dG at ', 'prefs_dimer_temp');
 			pack_gui('Entry', \$pd_temperature, 'prefs_dimer_temp', 3);
-			pack_gui('Label', 'Â°C');
+			pack_gui('Label', '°C');
 		
 	nr(\$prefs_page_connection_f, 2);
 		nr();
