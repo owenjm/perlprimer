@@ -1,3 +1,6 @@
+22/1/17  (PerlPrimer-1.2.3)
+- Added the option of using Onodera and Melcher (2004) rules for the 3' GC clamp.  This option is not currently enabled by default, but can be selected in the prefs "Exclusions" tab
+
 21/1/17  (PerlPrimer-1.2.2)
 - Added a "-1" button to the range options: use "Set from ORF" and then "-1" to only find primers that cover the entire ORF.
 
