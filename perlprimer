@@ -5586,6 +5586,7 @@ Steffen Moeller
 Karl Kashofer
 Henning Lenz
 Nick Kennedy
+Charles Plessy
 EOT
 	
 	$packed_widgets{ack_text}->insert('0.1', "Restriction enzyme data\n\n", 'bold');
