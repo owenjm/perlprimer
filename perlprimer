@@ -27,10 +27,16 @@ use utf8;
 # Usage message #
 #---------------#
 
-my ($version, $commandline, $win_exe);
+my ($version, $commandline, $os_name, $win_exe);
 BEGIN {
-	$version = "1.2.3";
-	$win_exe = 0;
+	$version = "1.2.4";
+	$os_name = $^O;
+	
+	if ($os_name eq 'MSWin32') {
+		$win_exe = 0;
+	} else {
+		$win_exe = 0;
+	}
 	
 	($commandline) = @ARGV;
 	
@@ -1164,6 +1170,7 @@ my $menu_tools = $menu->cascade(-label => 'Tools', -menuitems => [
 		[command => "Add cloning sequences", -command => \&find_re_sites, ],
 		"-",
 		[command => "Generate report", -command => \&generate_report, -accelerator=>'Ctrl-R' ],
+		[command => "Copy amplified seq to clipboard", -command => \&copy_amp, -accelerator=>'Ctrl-Shift-C' ],
 		"-",
 		[command => "Save default values for this page", -command => \&save_defaults, ],
 		[command => "Restore in-built default values", -command => \&restore_defaults, ],
@@ -4266,10 +4273,12 @@ sub copy_selected_primers {
 	# get selected primers
 	my @sel = $$ref->selectionGet;
 	
-	# Clipboard copying routine	
-	my $clip = ($page eq "seq") ?
-		"Name\tForward Primer\tPos\tLen\tTm\n" :
-		"Name\tForward Primer\tPos\tLen\tTm\tName\tReverse Primer\tPos\tLen\tTm\tAmp\tdG\n";
+	# Clipboard copying routine
+	my $clip;
+	
+	# $clip = ($page eq "seq") ?
+		# "Name\tForward Primer\tPos\tLen\tTm\n" :
+		# "Name\tForward Primer\tPos\tLen\tTm\tName\tReverse Primer\tPos\tLen\tTm\tAmp\tdG\n";
 	
 	my (@gene_array, $gene_frame, $seq);
 	if ($page eq "pd" && (($primer_seq_5f) || ($primer_seq_5r))) {
@@ -4286,13 +4295,23 @@ sub copy_selected_primers {
 		
 		my @details;
 		if ($page eq "seq") {
-			@details = (0 .. 3);
+			@details = ( 0, 100, 100, 1, 2, 3);
 		} else {
-			@details = ( 0 .. 4, 8, 6, 7, 9, 10 );
+			@details = ( 0, 100, 100, 1, 2, 3, 200, 4, 100, 100, 8, 6, 7, 9, 10 );
 		}
 		
 		for my $j (@details) {
 			# Names
+			if ($j == 100) {
+				$clip .= "\t";
+				next;
+			}
+			
+			if ($j == 200) {
+				$clip .= "\n";
+				next;
+			}
+			
 			if ($j == 0) {
 				$clip .= $file_name."_".$$slist[$sel][1]."F\t";
 			} elsif ($j == 4) {
@@ -4856,43 +4875,46 @@ sub fetch_ensembl {
 	my %trans;
 	my @enst_readable;
 	
-	if(length $response->{content}) {
-		my $gene = decode_json($response->{content});
-
-		push @gene_names, $gene->{description};
-		
-	}
-	
-	
-	if (@gene_names) {
-		# Ask user to confirm gene identity or pick the gene of interest if multiple matches	
-		my $ensembl_mm = $top->Toplevel(-title=>"Select gene of interest ...");
-		my $ensembl_mm_f = $ensembl_mm->Frame()->pack(-fill=>'both', -pady=>7);
-		my $ensembl_mm_fb = $ensembl_mm->Frame()->pack(-side=>'bottom', -fill=>'none');
-		nr(\$ensembl_mm_f);		
-			pack_gui('Label', "Found ".($#gene_names+1)." matching gene".($#gene_names > 0 ? 's' : '')." ...", "ensemble_mm_d_note");
-		nr();
-		$name = $gene_names[0];
-			pack_gui('BrowseEntry', \$name, 'ensembl_mm_d_genes', \@gene_names, 40);
-		
-		my $cancel=1;
-		nr(\$ensembl_mm_fb);
-		pack_gui('Button', 'OK', 'ensembl_ok', sub {
-				$cancel=undef;
-				$ensembl_mm->destroy;
-				$gene_id = $ids{$name}[0];
-			}, "active");
-		pack_gui('Button', 'Cancel', 'ensembl_cancel', sub {
-				$ensembl_mm->destroy;
-			});
-		
-		$ensembl_mm->Icon(-image => $pixmap);
-	
-		# (we need it to freeze execution at this point, since the user may
-		# wish to cancel and refine their choice)
-		$ensembl_mm->waitWindow;
-		return if $cancel;
-	}
+	#if(length $response->{content}) {
+	#	my $gene = decode_json($response->{content});
+	#	
+	#	use Data::Dumper;
+	#	print Dumper($gene);
+	#
+	#	push @gene_names, $gene->{display_name};
+	#	
+	#}
+	#
+	#
+	#if (@gene_names>1) {
+	#	# Ask user to confirm gene identity or pick the gene of interest if multiple matches	
+	#	my $ensembl_mm = $top->Toplevel(-title=>"Select gene of interest ...");
+	#	my $ensembl_mm_f = $ensembl_mm->Frame()->pack(-fill=>'both', -pady=>7);
+	#	my $ensembl_mm_fb = $ensembl_mm->Frame()->pack(-side=>'bottom', -fill=>'none');
+	#	nr(\$ensembl_mm_f);		
+	#		pack_gui('Label', "Found ".($#gene_names+1)." matching gene".($#gene_names > 0 ? 's' : '')." ...", "ensemble_mm_d_note");
+	#	nr();
+	#	$name = $gene_names[0];
+	#		pack_gui('BrowseEntry', \$name, 'ensembl_mm_d_genes', \@gene_names, 40);
+	#	
+	#	my $cancel=1;
+	#	nr(\$ensembl_mm_fb);
+	#	pack_gui('Button', 'OK', 'ensembl_ok', sub {
+	#			$cancel=undef;
+	#			$ensembl_mm->destroy;
+	#			$gene_id = $ids{$name}[0];
+	#		}, "active");
+	#	pack_gui('Button', 'Cancel', 'ensembl_cancel', sub {
+	#			$ensembl_mm->destroy;
+	#		});
+	#	
+	#	$ensembl_mm->Icon(-image => $pixmap);
+	#
+	#	# (we need it to freeze execution at this point, since the user may
+	#	# wish to cancel and refine their choice)
+	#	$ensembl_mm->waitWindow;
+	#	return if $cancel;
+	#}
 	
 	# Having selected the gene, we can now get the transcripts ... 
 	
@@ -4900,6 +4922,7 @@ sub fetch_ensembl {
 	if(length $response->{content}) {
 		my $gene = decode_json($response->{content});
 		$gene_id = $gene->{id};
+		$name = $gene->{display_name};
 		foreach my $v (@{ $gene->{Transcript}}) {
 			if ($v->{Translation}) {
 				push @enst_readable, "$v->{id} $v->{display_name} (size: $v->{Translation}->{length} aa)";
@@ -5362,6 +5385,94 @@ EOT
 		sbarprint("\n$file report generated");
 	}
 }
+
+
+#---------------------#
+# Copy amp sequences  #
+#---------------------#
+
+sub copy_amp {
+	my ($hlist_ref, $slist) = get_variables(qw(hlist primers));
+	my $nb_page = which_nb_page();
+	if ($nb_page eq "primer") {
+		dialogue("You can't generate a report from the primer information page - please switch to the project page first");
+		return;
+	}
+	
+	my ($hlist_sel) = $$hlist_ref->selectionGet;
+	unless (@$slist && defined($hlist_sel)) {
+		dialogue("The Copy Amp function saves the statistics and alignment of a particular primer pair - please select a primer pair first");
+		return;
+	}
+	
+	my $fprimer_mod = $fprimer = $$slist[$hlist_sel][0];
+	my $rprimer_mod = $rprimer = $$slist[$hlist_sel][4] unless $nb_page eq 'seq';
+	
+	my $fprimer_len = $$slist[$hlist_sel][2];
+	my $rprimer_len = $$slist[$hlist_sel][6];
+	
+	my $fprimerpos = $$slist[$hlist_sel][1];
+	my $rprimerpos = $$slist[$hlist_sel][8] unless $nb_page eq 'seq';
+	my $amplicon_size = $$slist[$hlist_sel][9] unless $nb_page eq 'seq';
+	
+	# Generate modified primers:
+	my (@gene_array, $gene_frame, $seq);
+	if ($nb_page eq "pd" && (($primer_seq_5f) || ($primer_seq_5r))) {
+		$seq = get_seq();
+		@gene_array=find_gene($seq);
+		$gene_frame=$gene_array[0][0]%3;
+	}
+	$seq = get_seq();
+	
+	for my $primer ($fprimer, $rprimer) {
+    		if ($nb_page eq "bis") {
+    			# Primer redundancy for CpG residues:
+			# Replaces T with Y (pyrimidine) for forward
+			# Replaces A with R (purine) for reverse
+    			
+			my $f_original = $$slist[$hlist_sel][11];
+                       	for my $i (0 .. length($f_original)) {
+                             	if (substr($f_original, $i, 2) eq "CG") {
+                             		substr($fprimer_mod, $i, 1) = 'Y';
+                             	} 
+                     	}
+			my $r_original = $$slist[$hlist_sel][12];
+                       	for my $i (0 .. length($r_original)) {
+                             	if (substr($r_original, $i, 2) eq "CG") {
+                             		substr($rprimer_mod, $i, 1) = 'R';
+                             	} 
+                     	}
+		} elsif ($nb_page eq "pd") {
+			if ($primer_seq_5f) {
+				my ($primer_seq_5f_real, $insert_f) = add_cloning($seq, $fprimer, $fprimerpos);
+				$fprimer_mod = uc("$primer_seq_5f_real$insert_f$fprimer");
+			}
+			
+			if ($primer_seq_5r) {
+				my ($primer_seq_5r_real, $insert_r) = (add_cloning($seq, '', '', '', $rprimer, $rprimerpos))[5,6];
+				$rprimer_mod = uc("$primer_seq_5r_real$insert_r$rprimer");
+				print STDOUT $rprimer_mod,"\n";
+				my $rprimer_mod_rev = reverse(complement($rprimer_mod));
+				print STDOUT $rprimer_mod_rev,"\n";
+			}
+		}
+	}
+	
+	print STDOUT "DEBUG: $seq\n\n";
+	print STDOUT "DEBUT: $fprimerpos+$fprimer_len, $rprimerpos-$rprimer_len-$fprimerpos-$fprimer_len+1\n\n";
+	
+	my $dna = substr($seq, $fprimerpos+$fprimer_len, $rprimerpos-$rprimer_len-$fprimerpos-$fprimer_len+1);
+	my $rprimer_mod_rev = reverse(complement($rprimer_mod));
+	my $ampseq = $fprimer_mod.$dna.$rprimer_mod_rev;
+	
+	print STDOUT "---ampseq---\n";
+	print STDOUT $ampseq;
+	print STDOUT "\n---ampseq---\n\n";
+	
+	$top->clipboardClear;
+	$top->clipboardAppend($ampseq);
+}
+
 
 
 #---------------#
@@ -7913,65 +8024,627 @@ sub load_icon_data {
 
 $perlprimer_icon = <<'end_of_pixmap';
 /* XPM */
-static char * dna_icon2_xpm[] = {
-"32 32 25 1",
-" 	c #FFFFFF",
-".	c #402E33",
-"+	c #A0302D",
-"@	c #918FC4",
-"#	c #B89590",
-"$	c #CAC7EE",
-"%	c #E4B82A",
-"&	c #969096",
-"*	c #E3382B",
-"=	c #924E32",
-"-	c #E76029",
-";	c #EFD4C7",
-">	c #69647F",
-",	c #F9FBF8",
-"'	c #DD6C69",
-")	c #80696A",
-"!	c #C0817E",
-"~	c #9F6160",
-"{	c #E08B27",
-"]	c #F7B6B3",
-"^	c #D2D1CF",
-"/	c #B3AEB2",
-"(	c #F92C2B",
-"_	c #AEACF1",
-":	c #E7A19D",
-"     *(;,,;:>@_>##!((;=((+      ",
-"      -;,,/>@_@/^,;(-;)=.       ",
-"      +*~&#/__&,,,-(({          ",
-"      .!,::#.>*',;*(**          ",
-"       ),;~&,'--,,~=++          ",
-"        &/&,!(*%:^)             ",
-"         +#,'*({(#&             ",
-"        .(:,^+=**/^.            ",
-"       +(%%],,#&&&)++           ",
-"       +({*(!&>>....~           ",
-"      +#+{(()$@@@>)!^^          ",
-"     +%;^/))/$____::,,!(+       ",
-"     ({(*;/&&&@)>)!#,,/*+       ",
-"     +-((~^^,__@:],@$^,;=       ",
-"      .=~&,,,___:]___,#+*+      ",
-"      =*#/&&&&>.!]$_$^!(***     ",
-"      +**+#__#:@@/^//,,]'%*     ",
-"       ++./__::__,,,^+'#/{      ",
-"          &/@#!@_$,^'*(-(+      ",
-"          !,##>&&^/,]({{*+      ",
-"          &,:@_@~'/^,,{{+       ",
-"           /~>@@**-(~,:+        ",
-"             ).&(%-(*,)         ",
-"           )#^^,;%{*~/&)        ",
-"           (-*+,,'(~))&/.       ",
-"           {((*;,;+))!))+       ",
-"           %-(',,,>)!&^^'=      ",
-"       =*=!](*!,/>>)~#,,/*+     ",
-"       **(;,''~.>>>&:];':(*     ",
-"       *(*,,,^>>@@_$/^'**++     ",
-"      +=*{,,/)~@__>^,,,-*       ",
-"     *(''*!)#~.>@$]];,;((+      "};
+static char * perlprimer40_xpm[] = {
+"40 40 579 2",
+"  	c None",
+". 	c #FFFFFF",
+"+ 	c #FEFEFE",
+"@ 	c #C9C8C8",
+"# 	c #F6F6F5",
+"$ 	c #FBFBFB",
+"% 	c #6E6D6D",
+"& 	c #EFF1F1",
+"* 	c #51231B",
+"= 	c #5E514F",
+"- 	c #DEDEDE",
+"; 	c #0D111C",
+"> 	c #2A3141",
+", 	c #2B3040",
+"' 	c #2B303E",
+") 	c #2E3442",
+"! 	c #2C303D",
+"~ 	c #323744",
+"{ 	c #2E323D",
+"] 	c #343844",
+"^ 	c #3E414D",
+"/ 	c #2A2C34",
+"( 	c #454C5C",
+"_ 	c #4C505F",
+": 	c #545968",
+"< 	c #5E636F",
+"[ 	c #686D77",
+"} 	c #727680",
+"| 	c #7A7D86",
+"1 	c #898B92",
+"2 	c #8D8E91",
+"3 	c #403837",
+"4 	c #DD624D",
+"5 	c #492823",
+"6 	c #FDFFFF",
+"7 	c #09090B",
+"8 	c #333B56",
+"9 	c #364A6C",
+"0 	c #49587B",
+"a 	c #465479",
+"b 	c #435278",
+"c 	c #47567E",
+"d 	c #4C5C86",
+"e 	c #495A85",
+"f 	c #4C5E8A",
+"g 	c #4F618F",
+"h 	c #151A28",
+"i 	c #1B367F",
+"j 	c #15317C",
+"k 	c #173583",
+"l 	c #1A3989",
+"m 	c #1A3A8C",
+"n 	c #1E4096",
+"o 	c #1F429B",
+"p 	c #204091",
+"q 	c #100E17",
+"r 	c #B75240",
+"s 	c #D35F4B",
+"t 	c #974334",
+"u 	c #C4C6C6",
+"v 	c #F5F7F7",
+"w 	c #360404",
+"x 	c #C60000",
+"y 	c #B40000",
+"z 	c #582C2B",
+"A 	c #E0E2E0",
+"B 	c #F3F2F0",
+"C 	c #E7E6E4",
+"D 	c #E3E2E0",
+"E 	c #E3E3E1",
+"F 	c #DAD9D7",
+"G 	c #D5D4D1",
+"H 	c #C4C3C2",
+"I 	c #CFCDC9",
+"J 	c #C8C6C1",
+"K 	c #B9B8B5",
+"L 	c #A9A9A7",
+"M 	c #A0A09F",
+"N 	c #989898",
+"O 	c #59595A",
+"P 	c #432921",
+"Q 	c #CB5C48",
+"R 	c #D15F4A",
+"S 	c #AD4C3B",
+"T 	c #B3B4B4",
+"U 	c #EFF3F3",
+"V 	c #570C0C",
+"W 	c #C50000",
+"X 	c #C20000",
+"Y 	c #C30000",
+"Z 	c #5A1010",
+"` 	c #E8EAE9",
+" .	c #696565",
+"..	c #99483A",
+"+.	c #CF5E4A",
+"@.	c #D05E4A",
+"#.	c #D4604B",
+"$.	c #391E1A",
+"%.	c #FEFFFF",
+"&.	c #796B6B",
+"*.	c #B00000",
+"=.	c #8D0307",
+"-.	c #312550",
+";.	c #39254F",
+">.	c #131E48",
+",.	c #374872",
+"'.	c #3E4F79",
+").	c #3F517D",
+"!.	c #303644",
+"~.	c #4B546A",
+"{.	c #646E89",
+"].	c #6A7694",
+"^.	c #505766",
+"/.	c #434143",
+"(.	c #6E3930",
+"_.	c #BC5341",
+":.	c #D15D49",
+"<.	c #653C35",
+"[.	c #DCDCDC",
+"}.	c #FDFDFD",
+"|.	c #5B4141",
+"1.	c #820206",
+"2.	c #2D4FAA",
+"3.	c #2F53B3",
+"4.	c #2E53B3",
+"5.	c #2E54B5",
+"6.	c #10131D",
+"7.	c #7B95D9",
+"8.	c #738CCD",
+"9.	c #2F2934",
+"0.	c #58291F",
+"a.	c #D7614C",
+"b.	c #D15E4A",
+"c.	c #C45946",
+"d.	c #46302C",
+"e.	c #FDFEFE",
+"f.	c #F5F5F5",
+"g.	c #705E5E",
+"h.	c #800000",
+"i.	c #9D0000",
+"j.	c #980000",
+"k.	c #990000",
+"l.	c #950000",
+"m.	c #8A0202",
+"n.	c #100D10",
+"o.	c #2A211F",
+"p.	c #893C2E",
+"q.	c #C05744",
+"r.	c #D5604C",
+"s.	c #DA624D",
+"t.	c #7C3427",
+"u.	c #928987",
+"v.	c #FAFAFB",
+"w.	c #737474",
+"x.	c #7D0E0E",
+"y.	c #C70000",
+"z.	c #880101",
+"A.	c #3C1B16",
+"B.	c #823E32",
+"C.	c #D8614C",
+"D.	c #D25F4B",
+"E.	c #B14F3D",
+"F.	c #694C47",
+"G.	c #BABCBC",
+"H.	c #E4E4E4",
+"I.	c #311313",
+"J.	c #3C0C0C",
+"K.	c #361A16",
+"L.	c #BA5543",
+"M.	c #CE5D49",
+"N.	c #D15E49",
+"O.	c #442019",
+"P.	c #A8A2A1",
+"Q.	c #FAFAFA",
+"R.	c #ACAEAE",
+"S.	c #7F5751",
+"T.	c #A44C3C",
+"U.	c #DB634D",
+"V.	c #883E30",
+"W.	c #59261D",
+"X.	c #271616",
+"Y.	c #CACCCC",
+"Z.	c #F0F0F0",
+"`.	c #463835",
+" +	c #A44B3C",
+".+	c #C75A47",
+"++	c #904235",
+"@+	c #060915",
+"#+	c #192756",
+"$+	c #17244F",
+"%+	c #350000",
+"&+	c #67605F",
+"*+	c #F9F9F9",
+"=+	c #AAABAB",
+"-+	c #74433B",
+";+	c #CA5A47",
+">+	c #BD5340",
+",+	c #592D25",
+"'+	c #1C191D",
+")+	c #000009",
+"!+	c #171636",
+"~+	c #1B224B",
+"{+	c #0A1A39",
+"]+	c #BC0000",
+"^+	c #C80000",
+"/+	c #910000",
+"(+	c #2B2625",
+"_+	c #B4B3B4",
+":+	c #C8C6C5",
+"<+	c #7D3A30",
+"[+	c #D35F4A",
+"}+	c #A94C3B",
+"|+	c #704339",
+"1+	c #72716F",
+"2+	c #A19A99",
+"3+	c #842928",
+"4+	c #C40000",
+"5+	c #D30000",
+"6+	c #410000",
+"7+	c #616161",
+"8+	c #EFEFEF",
+"9+	c #DDDEDE",
+"0+	c #60322A",
+"a+	c #C75946",
+"b+	c #302222",
+"c+	c #4F5C83",
+"d+	c #4A5779",
+"e+	c #495167",
+"f+	c #3D424E",
+"g+	c #373940",
+"h+	c #3B3C41",
+"i+	c #2C2D30",
+"j+	c #54575D",
+"k+	c #403C41",
+"l+	c #2D0A0D",
+"m+	c #6D0102",
+"n+	c #7F0000",
+"o+	c #880000",
+"p+	c #970000",
+"q+	c #940000",
+"r+	c #080606",
+"s+	c #ADA8A7",
+"t+	c #857A78",
+"u+	c #843B2E",
+"v+	c #262325",
+"w+	c #3D4A6A",
+"x+	c #4E5F8D",
+"y+	c #546797",
+"z+	c #5B6FA4",
+"A+	c #6076B0",
+"B+	c #647BBA",
+"C+	c #6C86C9",
+"D+	c #495A86",
+"E+	c #21449E",
+"F+	c #274DAE",
+"G+	c #2B52B5",
+"H+	c #2550AF",
+"I+	c #234FAB",
+"J+	c #254BA2",
+"K+	c #234799",
+"L+	c #203878",
+"M+	c #770506",
+"N+	c #150805",
+"O+	c #76706F",
+"P+	c #FCFDFD",
+"Q+	c #805149",
+"R+	c #924437",
+"S+	c #BAB9B9",
+"T+	c #FDFCFC",
+"U+	c #E8E8E7",
+"V+	c #D6D6D5",
+"W+	c #BFBFBD",
+"X+	c #ADACAB",
+"Y+	c #959594",
+"Z+	c #626366",
+"`+	c #606268",
+" @	c #4E5056",
+".@	c #3C3F44",
+"+@	c #373A40",
+"@@	c #2B2E37",
+"#@	c #19121E",
+"$@	c #200B17",
+"%@	c #281122",
+"&@	c #9F0203",
+"*@	c #980101",
+"=@	c #9E4738",
+"-@	c #837E7D",
+";@	c #7A3A2F",
+">@	c #934234",
+",@	c #A1A1A1",
+"'@	c #E7E5E5",
+")@	c #684443",
+"!@	c #B20000",
+"~@	c #A60000",
+"{@	c #703329",
+"]@	c #86574F",
+"^@	c #7A382C",
+"/@	c #CD5D49",
+"(@	c #432F2C",
+"_@	c #808695",
+":@	c #818693",
+"<@	c #898E99",
+"[@	c #90949E",
+"}@	c #9B9EA7",
+"|@	c #A0A3AA",
+"1@	c #ABADB3",
+"2@	c #B0B2B7",
+"3@	c #B9BABE",
+"4@	c #C2C3C5",
+"5@	c #C1C1C2",
+"6@	c #C7C7C8",
+"7@	c #C7C8C8",
+"8@	c #C6C6C7",
+"9@	c #C8C8C9",
+"0@	c #C7C7C7",
+"a@	c #D1D2D2",
+"b@	c #332B2B",
+"c@	c #8E0507",
+"d@	c #510908",
+"e@	c #CC5C48",
+"f@	c #793A2F",
+"g@	c #7C392D",
+"h@	c #A04838",
+"i@	c #130B15",
+"j@	c #315CC8",
+"k@	c #2F56BC",
+"l@	c #2F56BB",
+"m@	c #2F56BA",
+"n@	c #2F55B9",
+"o@	c #2F56B9",
+"p@	c #3059C3",
+"q@	c #293042",
+"r@	c #7994D8",
+"s@	c #7993D7",
+"t@	c #7993D8",
+"u@	c #7993D6",
+"v@	c #7993D5",
+"w@	c #162438",
+"x@	c #854337",
+"y@	c #331613",
+"z@	c #7D0105",
+"A@	c #5F0200",
+"B@	c #3C3737",
+"C@	c #9F9F9E",
+"D@	c #969696",
+"E@	c #959596",
+"F@	c #929292",
+"G@	c #949495",
+"H@	c #939395",
+"I@	c #908F91",
+"J@	c #939495",
+"K@	c #898A8D",
+"L@	c #909193",
+"M@	c #8F9093",
+"N@	c #8D8F93",
+"O@	c #888B91",
+"P@	c #858890",
+"Q@	c #868B95",
+"R@	c #656B79",
+"S@	c #332C35",
+"T@	c #AF4E3C",
+"U@	c #D3604B",
+"V@	c #7A382D",
+"W@	c #7F6966",
+"X@	c #330E0C",
+"Y@	c #830505",
+"Z@	c #968F8F",
+"`@	c #B3AFAF",
+" #	c #5C2B23",
+".#	c #7D564F",
+"+#	c #C6C5C4",
+"@#	c #0E0000",
+"##	c #710409",
+"$#	c #270106",
+"%#	c #414045",
+"&#	c #5D5E62",
+"*#	c #616265",
+"=#	c #616266",
+"-#	c #4E5053",
+";#	c #5A595A",
+">#	c #636366",
+",#	c #656567",
+"'#	c #6B6D72",
+")#	c #54595E",
+"!#	c #6A4943",
+"~#	c #AD4E3D",
+"{#	c #4D241D",
+"]#	c #D5D6D6",
+"^#	c #A09F9F",
+"/#	c #680202",
+"(#	c #CD0000",
+"_#	c #250812",
+":#	c #2B5AC3",
+"<#	c #2C56BB",
+"[#	c #2A55B9",
+"}#	c #2A54B9",
+"|#	c #2C54B9",
+"1#	c #2B52B6",
+"2#	c #264AA8",
+"3#	c #3E4C70",
+"4#	c #7B97DE",
+"5#	c #7994DA",
+"6#	c #5870A5",
+"7#	c #3C282E",
+"8#	c #944436",
+"9#	c #DB624D",
+"0#	c #B34F3E",
+"a#	c #664F4B",
+"b#	c #F9FBFB",
+"c#	c #64605F",
+"d#	c #4C0202",
+"e#	c #62070F",
+"f#	c #660810",
+"g#	c #68050B",
+"h#	c #690307",
+"i#	c #310D11",
+"j#	c #34363A",
+"k#	c #929598",
+"l#	c #747679",
+"m#	c #4A4D53",
+"n#	c #261E21",
+"o#	c #B45140",
+"p#	c #883F32",
+"q#	c #999494",
+"r#	c #8D8F8E",
+"s#	c #430000",
+"t#	c #BA0101",
+"u#	c #D40000",
+"v#	c #7E0000",
+"w#	c #150606",
+"x#	c #AE4F3E",
+"y#	c #A64939",
+"z#	c #6F504A",
+"A#	c #BEBFBF",
+"B#	c #141616",
+"C#	c #A00000",
+"D#	c #BC0101",
+"E#	c #980303",
+"F#	c #261310",
+"G#	c #5C2F27",
+"H#	c #6F3B31",
+"I#	c #8F8E8C",
+"J#	c #9DA0A0",
+"K#	c #241514",
+"L#	c #864133",
+"M#	c #C35846",
+"N#	c #DB634E",
+"O#	c #B85442",
+"P#	c #50312B",
+"Q#	c #A39D9B",
+"R#	c #E6E7E7",
+"S#	c #FCFCFC",
+"T#	c #A39C9B",
+"U#	c #54271F",
+"V#	c #D25E4A",
+"W#	c #C45845",
+"X#	c #9A4536",
+"Y#	c #281922",
+"Z#	c #0B0C1B",
+"`#	c #B70909",
+" $	c #BC8989",
+".$	c #DCDEDE",
+"+$	c #ECECEC",
+"@$	c #423533",
+"#$	c #C05644",
+"$$	c #D35E49",
+"%$	c #411F1B",
+"&$	c #100D18",
+"*$	c #264596",
+"=$	c #2F57BD",
+"-$	c #224594",
+";$	c #930000",
+">$	c #C10000",
+",$	c #760909",
+"'$	c #969292",
+")$	c #C1C3C4",
+"!$	c #6C3B32",
+"~$	c #D45F4A",
+"{$	c #994536",
+"]$	c #80544D",
+"^$	c #979594",
+"/$	c #A7A9AC",
+"($	c #929298",
+"_$	c #4F4545",
+":$	c #340000",
+"<$	c #6F0001",
+"[$	c #960000",
+"}$	c #6A3E3E",
+"|$	c #F2F1F1",
+"1$	c #703F37",
+"2$	c #BF5846",
+"3$	c #2B1F23",
+"4$	c #64686E",
+"5$	c #ACADAF",
+"6$	c #C4C4C6",
+"7$	c #E4E4E5",
+"8$	c #F2F2F2",
+"9$	c #F6F6F7",
+"0$	c #B7B8B8",
+"a$	c #3F1313",
+"b$	c #B40001",
+"c$	c #BA0000",
+"d$	c #510E0E",
+"e$	c #C7C3C3",
+"f$	c #5C4F4D",
+"g$	c #D9624D",
+"h$	c #6B3128",
+"i$	c #48567A",
+"j$	c #7C99E0",
+"k$	c #7792D9",
+"l$	c #728BCE",
+"m$	c #6D85C4",
+"n$	c #677EB9",
+"o$	c #657BB4",
+"p$	c #47567F",
+"q$	c #253D7C",
+"r$	c #2E4D97",
+"s$	c #1F3C80",
+"t$	c #2B3674",
+"u$	c #2D3169",
+"v$	c #2F2B5D",
+"w$	c #322755",
+"x$	c #3C1530",
+"y$	c #670202",
+"z$	c #8E9393",
+"A$	c #F4F6F7",
+"B$	c #582D26",
+"C$	c #66413A",
+"D$	c #6E7276",
+"E$	c #646568",
+"F$	c #606164",
+"G$	c #5E616A",
+"H$	c #616674",
+"I$	c #5F677A",
+"J$	c #5F6983",
+"K$	c #454E64",
+"L$	c #314476",
+"M$	c #314987",
+"N$	c #2E488C",
+"O$	c #2B4893",
+"P$	c #284696",
+"Q$	c #234091",
+"R$	c #2B4697",
+"S$	c #254595",
+"T$	c #8F0307",
+"U$	c #830101",
+"V$	c #DBD9D9",
+"W$	c #BBBCBD",
+"X$	c #A04637",
+"Y$	c #DD644E",
+"Z$	c #593D38",
+"`$	c #FFFFFE",
+" %	c #FCFCFB",
+".%	c #F7F7F7",
+"+%	c #F4F4F4",
+"@%	c #F2F3F3",
+"#%	c #F3F3F4",
+"$%	c #B4B2B2",
+"%%	c #570000",
+"&%	c #BA0001",
+"*%	c #BE0000",
+"=%	c #BF0000",
+"-%	c #543737",
+";%	c #A0A0A0",
+">%	c #CA5945",
+",%	c #633931",
+"'%	c #DFE0E0",
+")%	c #CDD1D1",
+"!%	c #662424",
+"~%	c #B90000",
+"{%	c #9A0000",
+"]%	c #B6AEAE",
+"^%	c #C9C6C6",
+"/%	c #47312D",
+"(%	c #DBDADA",
+"_%	c #5E4343",
+":%	c #625555",
+"<%	c #FAFBFB",
+"[%	c #F8F8F8",
+". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ",
+". . . . . . . . . . + . . . . . . . . . . . . . . . . . . . @ # . . . . . . . . ",
+". . . . . . . . $ % . . . . . . . . . . . . . . . . . . . & * = . . . . . . . . ",
+". . . . . . . . - ; > , ' ) ! ~ { ] ^ / ( _ : < [ } | 1 2 3 4 5 6 . . . . . . . ",
+". . . . . . . . 7 8 9 0 a b c d e f g h i j k l m n o p q r s t u . . . . . . . ",
+". . . . . . . v w x y z A B C D E F G H I J K L M N O P Q R R S T . . . . . . . ",
+". . . . . . . U V W X Y Z ` . . . . . . . . . . .  ...+.@.@.#.$.%.. . . . . . . ",
+". . . . . . . . &.*.=.-.;.>.,.'.'.).!.~.{.].^./.(._.s @.@.:.<.[.. . . . . . . . ",
+". . . . . . . . }.|.1.2.3.3.3.3.4.5.6.7.8.9.0.a.b.@.@.b.c.d.e.. . . . . . . . . ",
+". . . . . . . . . f.g.h.i.j.k.k.l.m.n.o.p.q.r.@.@.@.s.t.u.v.. . . . . . . . . . ",
+". . . . . . . . . . . w.x.X y.*.z.A.B.C.D.@.@.@.r.E.F.G.. . . . . . . . . . . . ",
+". . . . . . . . . . . . H.I.J.K.L.M.b.@.@.@.D.N.O.P.Q.. . . . . . . . . . . . . ",
+". . . . . . . . . . . . R.S.T.U.b.@.@.s U.V.W.X.Y.. . . . . . . . . . . . . . . ",
+". . . . . . . . . . Z.`. +s @.@.@.b..+++@+#+$+y.%+&+*+. . . . . . . . . . . . . ",
+". . . . . . . . . =+-+;+D.@.@.a.>+,+'+)+!+~+{+]+^+/+(+_+. . . . . . . . . . . . ",
+". . . . . . . . :+<+s.@.b.[+}+|+1+. . . 2+3+*.y.4+4+5+6+7+8+. . . . . . . . . . ",
+". . . . . . . 9+0+s @.@.a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p+q+r+s+. . . . . . . . . ",
+". . . . . . . t+C.@.#.u+v+w+x+y+z+A+B+C+D+E+F+G+H+I+J+K+L+M+N+O+P+. . . . . . . ",
+". . . . . . . Q+D.D.R+S+. . T+U+V+W+X+Y+Z+`+ @.@+@@@#@$@%@&@*@=@-@. . . . . . . ",
+". . . . . . . ;@b.>@,@. . . . . . . . . . . . . . . '@)@!@Y ~@{@]@. . . . . . . ",
+". . . . . . . ^@/@(@_@:@<@[@}@|@1@2@3@4@5@6@7@8@9@0@9@a@b@c@d@e@f@. . . . . . . ",
+". . . . . . . g@h@i@j@k@k@l@l@l@m@n@o@p@q@r@r@s@t@s@s@u@v@w@}+@.^@. . . . . . . ",
+". . . . . . . x@y@z@A@B@C@D@E@F@G@H@I@J@K@L@M@N@O@P@Q@R@S@T@U@@.V@. . . . . . . ",
+". . . . . . . W@X@x 4+Y@Z@. . . . . . . . . . . . }.`@ #C.@.@.D..#. . . . . . . ",
+". . . . . . . +#@#Y 4+##$#%#&#*#*#*#=#-#;#>#,#'#)#!#~##.@.@.:.{#]#. . . . . . . ",
+". . . . . . . . ^#/#(#_#:#<#[#}#|#1#2#3#4#5#6#7#8#9#@.@.D.0#a#b#. . . . . . . . ",
+". . . . . . . . . c#d#!@e#f#g#h#i#j#k#l#m#n#o#/@b.@.@.C.p#q#+ . . . . . . . . . ",
+". . . . . . . . . . r#s#t#y.x ^+u#v#w#(.x#s.b.@.@.a.y#z#A#. . . . . . . . . . . ",
+". . . . . . . . . . . f.B#C#D#E#F#G#a.b.@.@.@.@.e@H#I#. . . . . . . . . . . . . ",
+". . . . . . . . . . . . }.J#K#L#M#r.@.@.@.N#O#P#Q#R#. . . . . . . . . . . . . . ",
+". . . . . . . . . . . S#T#U#V#D.@.@.r.W#X#Y#Z#`# $.$. . . . . . . . . . . . . . ",
+". . . . . . . . . . +$@$#$b.@.@.D.$$%$&$*$=$-$;$>$,$'$. . . . . . . . . . . . . ",
+". . . . . . . . . )$!$~$@.@.s.{$]$^$/$($_$:$<$>$>$x [$}$9+. . . . . . . . . . . ",
+". . . . . . . . |$1$C.@.@.2$3$4$5$6$7$8$9$0$a$b$c$c$]+W d$e$. . . . . . . . . . ",
+". . . . . . . . f$a+@.g$h$i$j$k$l$m$n$o$p$q$r$s$t$u$v$w$x$y$z$. . . . . . . . . ",
+". . . . . . . A$B$#.e@C$D$E$F$&#G$H$I$J$K$L$M$N$O$P$Q$R$S$T$U$V$. . . . . . . . ",
+". . . . . . . W$X$Y$Z$Z.. . . . `$}. %Q..%.%f.+%@%#%$%%%&%*%=%-%. . . . . . . . ",
+". . . . . . . ;%>%,%'%. . . . . . . . . . . . . . . . )%!%~%{%]%. . . . . . . . ",
+". . . . . . . ^%/%(%. . . . . . . . . . . . . . . . . . . _%:%+ . . . . . . . . ",
+". . . . . . . . <%. . . . . . . . . . . . . . . . . . . . <%[%. . . . . . . . . "};
 end_of_pixmap
 		
 $icon_open = <<'end_of_pixmap';

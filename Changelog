@@ -1,3 +1,9 @@
+23/11/18  (PerlPrimer-1.2.4)
+- Fixed small Ensembl retrieval bug
+- Changed primer clipboard copy routines so that copied primer sequences are compatible with common primer synthesis spreadsheet formats
+- Added new icon bitmap
+- Improved compatibility with Windows 7
+
 22/1/17  (PerlPrimer-1.2.3)
 - Added the option of using Onodera and Melcher (2004) rules for the 3' GC clamp.  This option is not currently enabled by default, but can be selected in the prefs "Exclusions" tab
 
